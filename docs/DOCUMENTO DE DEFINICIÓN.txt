@@ -1,0 +1,295 @@
+ DOCUMENTO DE DEFINICIÓN DE SISTEMA
+
+## Plataforma Educacional Escolar
+
+---
+
+## 1. Introducción
+
+El presente documento tiene como objetivo definir el alcance, los módulos y los requerimientos principales para el desarrollo de una plataforma educacional integral orientada a establecimientos escolares.
+
+La solución está diseñada para soportar aproximadamente 3.000 alumnos, junto con sus apoderados, docentes y equipo directivo, permitiendo centralizar la gestión académica, la comunicación institucional y el seguimiento del desempeño estudiantil.
+
+---
+
+## 2. Objetivo General
+
+Desarrollar una plataforma web y móvil que permita gestionar de manera integral los procesos académicos, administrativos y comunicacionales de un establecimiento educacional.
+
+---
+
+## 3. Objetivos Específicos
+
+* Centralizar la gestión de información académica.
+* Facilitar la comunicación entre colegio, profesores, estudiantes y apoderados.
+* Permitir el seguimiento del rendimiento académico y asistencia.
+* Digitalizar procesos como evaluaciones, notas y materiales.
+* Incorporar herramientas de análisis para apoyo a la toma de decisiones.
+
+---
+
+## 4. Alcance del Sistema
+
+La plataforma considera los siguientes actores:
+
+* Profesores
+* Profesores jefes
+* Estudiantes
+* Apoderados
+* Dirección
+* Administradores
+
+El sistema incluirá:
+
+* Plataforma web completa
+* Aplicación móvil para usuarios finales
+* Backend centralizado con API
+* Base de datos académica
+
+---
+
+## 5. Módulos del Sistema
+
+### 5.1 Autenticación y Gestión de Usuarios
+
+*Funcionalidades:*
+
+* Inicio de sesión
+* Recuperación de contraseña
+* Gestión de roles
+* Control de accesos
+
+---
+
+### 5.2 Gestión Académica
+
+*Funcionalidades:*
+
+* Creación de cursos
+* Asignación de asignaturas
+* Vinculación de docentes
+* Asociación de alumnos y apoderados
+
+---
+
+### 5.3 Gestión de Archivos por Asignatura
+
+*Funcionalidades:*
+
+* Subida de material educativo
+* Organización por curso y unidad
+* Control de visibilidad
+* Descarga de archivos
+
+---
+
+### 5.4 Gestión de Evaluaciones
+
+*Funcionalidades:*
+
+* Creación de evaluaciones
+* Definición de fechas y ponderaciones
+* Publicación a estudiantes
+* Integración con calendario
+
+---
+
+### 5.5 Gestión de Notas
+
+*Funcionalidades:*
+
+* Registro de calificaciones
+* Edición con trazabilidad
+* Cálculo automático de promedios
+* Visualización por estudiante y curso
+
+---
+
+### 5.6 Gestión de Asistencia
+
+*Funcionalidades:*
+
+* Registro de asistencia diaria
+* Estados: presente, ausente, atrasado, justificado
+* Historial de asistencia
+* Cálculo de porcentaje de asistencia
+* Alertas por inasistencia reiterada
+
+---
+
+### 5.7 Seguimiento Académico
+
+*Funcionalidades:*
+
+* Dashboard de rendimiento
+* Indicadores por curso
+* Alertas de bajo rendimiento
+* Visualización individual por estudiante
+
+---
+
+### 5.8 Portal de Estudiantes
+
+*Funcionalidades:*
+
+* Acceso a material
+* Consulta de notas
+* Revisión de evaluaciones
+* Recepción de notificaciones
+
+---
+
+### 5.9 Portal de Apoderados
+
+*Funcionalidades:*
+
+* Visualización de información de alumnos
+* Consulta de notas y asistencia
+* Recepción de comunicados
+* Solicitud de reuniones
+
+---
+
+### 5.10 Agenda y Reuniones
+
+*Funcionalidades:*
+
+* Disponibilidad de docentes
+* Solicitud de reuniones
+* Confirmación y cancelación
+* Registro histórico
+
+---
+
+### 5.11 Notificaciones y Comunicaciones
+
+*Funcionalidades:*
+
+* Envío de avisos por curso o establecimiento
+* Notificaciones push
+* Correos electrónicos
+* Historial de mensajes
+
+---
+
+### 5.12 Reportes y Analítica
+
+*Funcionalidades:*
+
+* Reportes de notas
+* Reportes de asistencia
+* Indicadores de rendimiento
+* Exportación de datos
+
+---
+
+### 5.13 Aplicación Móvil
+
+*Funcionalidades:*
+
+* Acceso a información clave
+* Notificaciones en tiempo real
+* Consulta de notas y asistencia
+* Acceso a materiales
+
+---
+
+## 6. Requerimientos Funcionales (Resumen)
+
+* Gestión de usuarios y roles
+* Registro de notas
+* Registro de asistencia
+* Publicación de material
+* Creación de evaluaciones
+* Consulta de información académica
+* Envío de notificaciones
+* Gestión de reuniones
+
+---
+
+## 7. Requerimientos No Funcionales
+
+### Rendimiento
+
+* Soporte para más de 6.000 usuarios concurrentes
+
+### Seguridad
+
+* Encriptación de datos
+* Acceso por roles
+* Protección de datos personales
+
+### Disponibilidad
+
+* 99,5% uptime
+* Backups automáticos
+
+### Escalabilidad
+
+* Arquitectura basada en API
+* Preparada para crecimiento
+
+### Usabilidad
+
+* Interfaz intuitiva
+* Diseño responsive
+
+---
+
+## 8. Arquitectura Propuesta
+
+* Frontend Web (React o similar)
+* Aplicación móvil (Android/iOS)
+* Backend API REST
+* Base de datos relacional
+* Almacenamiento de archivos en nube
+
+---
+
+## 9. Entidades Principales
+
+* Usuario
+* Rol
+* Alumno
+* Apoderado
+* Profesor
+* Curso
+* Asignatura
+* Evaluación
+* Nota
+* Asistencia
+* Material
+* Notificación
+* Reunión
+
+---
+
+## 10. Fases de Implementación
+
+### Fase 1
+
+* Usuarios
+* Cursos
+* Material
+* Evaluaciones
+* Notas
+
+### Fase 2
+
+* Asistencia
+* Notificaciones
+* Dashboard
+
+### Fase 3
+
+* App móvil
+* Agenda
+* Analítica avanzada
+
+---
+
+## 11. Conclusión
+
+La plataforma propuesta corresponde a una solución integral de gestión educacional que permite digitalizar los procesos académicos, mejorar la comunicación institucional y facilitar el seguimiento del rendimiento de los estudiantes.
+
+El diseño modular permite una implementación progresiva, asegurando escalabilidad, seguridad y adaptabilidad a las necesidades del establecimiento.
