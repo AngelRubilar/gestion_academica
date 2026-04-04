@@ -1,0 +1,14 @@
+{
+  "name": "@gestion-academica/mobile",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "echo \"Mobile: configure in Fase 3\"",
+    "build": "echo \"Mobile: configure in Fase 3\"",
+    "lint": "echo \"Mobile: configure in Fase 3\"",
+    "test": "echo \"Mobile: configure in Fase 3\""
+  },
+  "dependencies": {
+    "@gestion-academica/shared": "workspace:*"
+  }
+}

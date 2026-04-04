@@ -1,0 +1,15 @@
+{
+  "name": "@gestion-academica/web",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "echo \"Web: configure in issue #5\"",
+    "build": "echo \"Web: configure in issue #5\"",
+    "lint": "echo \"Web: configure in issue #5\"",
+    "test": "echo \"Web: configure in issue #5\""
+  },
+  "dependencies": {
+    "@gestion-academica/shared": "workspace:*",
+    "@gestion-academica/ui": "workspace:*"
+  }
+}

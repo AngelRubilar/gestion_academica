@@ -1,0 +1,14 @@
+{
+  "name": "@gestion-academica/api",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "echo \"API: configure in issue #4\"",
+    "build": "echo \"API: configure in issue #4\"",
+    "lint": "echo \"API: configure in issue #4\"",
+    "test": "echo \"API: configure in issue #4\""
+  },
+  "dependencies": {
+    "@gestion-academica/shared": "workspace:*"
+  }
+}
