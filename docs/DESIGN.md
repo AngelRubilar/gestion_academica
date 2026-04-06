@@ -6,20 +6,20 @@ Plataforma web y móvil para gestión académica integral de establecimientos es
 
 ## Stack Tecnológico
 
-| Capa | Tecnología |
-|------|-----------|
-| Lenguaje | TypeScript (end-to-end) |
-| Frontend Web | Next.js (App Router) + Tailwind CSS + shadcn/ui |
-| Backend API | NestJS (Node.js) |
-| Base de datos | PostgreSQL + Prisma ORM |
-| App Móvil | React Native con Expo |
-| Cache/Colas | Redis + Bull |
-| Almacenamiento de archivos | MinIO (S3-compatible, self-hosted) |
-| Notificaciones push | Firebase Cloud Messaging |
-| Monorepo | Turborepo |
-| Containerización | Docker + Docker Compose |
-| CI/CD | GitHub Actions |
-| Reverse Proxy | Nginx + Let's Encrypt |
+| Capa                       | Tecnología                                      |
+| -------------------------- | ----------------------------------------------- |
+| Lenguaje                   | TypeScript (end-to-end)                         |
+| Frontend Web               | Next.js (App Router) + Tailwind CSS + shadcn/ui |
+| Backend API                | NestJS (Node.js)                                |
+| Base de datos              | PostgreSQL + Prisma ORM                         |
+| App Móvil                  | React Native con Expo                           |
+| Cache/Colas                | Redis + Bull                                    |
+| Almacenamiento de archivos | MinIO (S3-compatible, self-hosted)              |
+| Notificaciones push        | Firebase Cloud Messaging                        |
+| Monorepo                   | Turborepo                                       |
+| Containerización           | Docker + Docker Compose                         |
+| CI/CD                      | GitHub Actions                                  |
+| Reverse Proxy              | Nginx + Let's Encrypt                           |
 
 ## Actores del Sistema
 
@@ -60,6 +60,7 @@ plataforma-educacional/
 ### Modelo de despliegue — Instancia por colegio
 
 Cada colegio tiene su propio despliegue completo e independiente:
+
 - Su propia instancia de API, Web, PostgreSQL y Redis
 - Aislamiento total de datos entre colegios
 - Desplegar un colegio nuevo = copiar docker-compose + ajustar variables de entorno
@@ -166,6 +167,7 @@ El dashboard adapta su contenido según el rol del usuario logueado. Un profesor
 ### Alcance
 
 Principalmente consumo de información:
+
 - Consulta de notas y asistencia
 - Recepción de notificaciones push
 - Descarga de materiales
@@ -198,6 +200,7 @@ Tipos, validaciones (Zod) y lógica de llamadas al API viven en `packages/shared
 ### Docker por instancia
 
 Cada colegio corre su propio stack containerizado:
+
 - Nginx (reverse proxy + SSL con Let's Encrypt)
 - API (NestJS)
 - Web (Next.js en modo producción)
@@ -219,6 +222,7 @@ Cada colegio corre su propio stack containerizado:
 ## Módulos del Sistema
 
 ### Fase 1
+
 1. Autenticación y gestión de usuarios
 2. Gestión académica (cursos, asignaturas, vinculaciones)
 3. Gestión de archivos por asignatura
@@ -226,11 +230,13 @@ Cada colegio corre su propio stack containerizado:
 5. Gestión de notas
 
 ### Fase 2
+
 6. Gestión de asistencia
 7. Notificaciones y comunicaciones
 8. Seguimiento académico (dashboards)
 
 ### Fase 3
+
 9. App móvil
 10. Agenda y reuniones
 11. Reportes y analítica avanzada

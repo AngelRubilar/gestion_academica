@@ -1,21 +1,22 @@
 # Fase 1 — Fundación + Core Académico
 
 ## Objetivo
+
 Construir la base completa de la plataforma: infraestructura, autenticación, gestión de entidades académicas, materiales, evaluaciones y notas.
 
 ## Stack Tecnológico
 
-| Capa | Tecnología |
-|------|-----------|
-| Lenguaje | TypeScript (end-to-end) |
-| Frontend Web | Next.js (App Router) + Tailwind CSS + shadcn/ui |
-| Backend API | NestJS (Node.js) |
-| Base de datos | PostgreSQL + Prisma ORM |
-| Cache/Colas | Redis + Bull |
-| Almacenamiento | MinIO (S3-compatible) |
-| Monorepo | Turborepo |
-| Containerización | Docker + Docker Compose |
-| CI/CD | GitHub Actions |
+| Capa             | Tecnología                                      |
+| ---------------- | ----------------------------------------------- |
+| Lenguaje         | TypeScript (end-to-end)                         |
+| Frontend Web     | Next.js (App Router) + Tailwind CSS + shadcn/ui |
+| Backend API      | NestJS (Node.js)                                |
+| Base de datos    | PostgreSQL + Prisma ORM                         |
+| Cache/Colas      | Redis + Bull                                    |
+| Almacenamiento   | MinIO (S3-compatible)                           |
+| Monorepo         | Turborepo                                       |
+| Containerización | Docker + Docker Compose                         |
+| CI/CD            | GitHub Actions                                  |
 
 ## Estructura del Monorepo
 
@@ -38,15 +39,15 @@ gestion_academica/
 
 ## Roles del Sistema
 
-| Rol | Descripción |
-|-----|------------|
-| SUPER_ADMIN | Equipo de desarrollo — configuración técnica, soporte, mantenimiento |
-| ADMIN | Personal del colegio — gestión de usuarios, cursos, datos académicos |
-| DIRECTOR | Dashboards, reportes, indicadores globales |
-| PROFESOR_JEFE | Seguimiento de curso + funciones de profesor |
-| PROFESOR | Notas, asistencia, material, evaluaciones |
-| ESTUDIANTE | Consulta de información propia |
-| APODERADO | Consulta de información de hijos, comunicados, reuniones |
+| Rol           | Descripción                                                          |
+| ------------- | -------------------------------------------------------------------- |
+| SUPER_ADMIN   | Equipo de desarrollo — configuración técnica, soporte, mantenimiento |
+| ADMIN         | Personal del colegio — gestión de usuarios, cursos, datos académicos |
+| DIRECTOR      | Dashboards, reportes, indicadores globales                           |
+| PROFESOR_JEFE | Seguimiento de curso + funciones de profesor                         |
+| PROFESOR      | Notas, asistencia, material, evaluaciones                            |
+| ESTUDIANTE    | Consulta de información propia                                       |
+| APODERADO     | Consulta de información de hijos, comunicados, reuniones             |
 
 ## Plan de Trabajo — Bloques e Issues
 
@@ -63,13 +64,13 @@ gestion_academica/
 
 > Se hace primero. Todo lo demás depende de esto.
 
-| Issue | Título | Tipo | Dependencia | Paralelo |
-|-------|--------|------|-------------|----------|
-| #1 | Scaffolding monorepo con Turborepo | setup | — | — |
-| #2 | Setup Docker + Docker Compose | setup | #1 | — |
-| #3 | Schema Prisma - Modelos de Fase 1 | backend | #2 | — |
-| #4 | Config base NestJS | backend | #3 | Con #5 |
-| #5 | Config base Next.js | frontend | #3 | Con #4 |
+| Issue | Título                             | Tipo     | Dependencia | Paralelo |
+| ----- | ---------------------------------- | -------- | ----------- | -------- |
+| #1    | Scaffolding monorepo con Turborepo | setup    | —           | —        |
+| #2    | Setup Docker + Docker Compose      | setup    | #1          | —        |
+| #3    | Schema Prisma - Modelos de Fase 1  | backend  | #2          | —        |
+| #4    | Config base NestJS                 | backend  | #3          | Con #5   |
+| #5    | Config base Next.js                | frontend | #3          | Con #4   |
 
 **Asignación sugerida:** Issues 1-3 secuenciales (cualquier dev). Issues 4 y 5 en paralelo (uno por dev).
 
@@ -79,16 +80,17 @@ gestion_academica/
 
 > Segundo bloque. La mayoría de módulos dependen de auth.
 
-| Issue | Título | Tipo | Dependencia | Paralelo |
-|-------|--------|------|-------------|----------|
-| #6 | Backend: Login y registro (JWT) | backend | #4 | — |
-| #7 | Backend: Recuperación de contraseña | backend | #6 | Con #8 |
-| #8 | Backend: Guards de roles y permisos | backend | #6 | Con #7 |
-| #9 | Frontend: Login y registro | frontend | #5, #6 | Con #10 |
-| #10 | Frontend: Recuperación de contraseña | frontend | #5, #7 | Con #9 |
-| #11 | Frontend: Auth context y protección de rutas | frontend | #9, #8 | — |
+| Issue | Título                                       | Tipo     | Dependencia | Paralelo |
+| ----- | -------------------------------------------- | -------- | ----------- | -------- |
+| #6    | Backend: Login y registro (JWT)              | backend  | #4          | —        |
+| #7    | Backend: Recuperación de contraseña          | backend  | #6          | Con #8   |
+| #8    | Backend: Guards de roles y permisos          | backend  | #6          | Con #7   |
+| #9    | Frontend: Login y registro                   | frontend | #5, #6      | Con #10  |
+| #10   | Frontend: Recuperación de contraseña         | frontend | #5, #7      | Con #9   |
+| #11   | Frontend: Auth context y protección de rutas | frontend | #9, #8      | —        |
 
 **Asignación sugerida:**
+
 - Dev A: #7 → #10
 - Dev B: #8 → #9 → #11
 - Issue #6 primero (cualquier dev)
@@ -101,31 +103,31 @@ gestion_academica/
 
 #### Dev A — Usuarios y personas
 
-| Issue | Título | Tipo | Dependencia |
-|-------|--------|------|-------------|
-| #12 | Backend: CRUD Usuarios | backend | #8 |
-| #13 | Backend: CRUD Profesores | backend | #12 |
-| #14 | Backend: CRUD Alumnos | backend | #12 |
-| #15 | Backend: CRUD Apoderados | backend | #12 |
-| #16 | Backend: Vinculación apoderado-alumno | backend | #14, #15 |
-| #21 | Frontend: Gestión de usuarios | frontend | #11, #12 |
-| #22 | Frontend: Gestión de profesores | frontend | #11, #13 |
-| #23 | Frontend: Gestión de alumnos | frontend | #11, #14 |
-| #24 | Frontend: Gestión de apoderados | frontend | #11, #15 |
-| #25 | Frontend: Vinculación apoderado-alumno | frontend | #11, #16 |
+| Issue | Título                                 | Tipo     | Dependencia |
+| ----- | -------------------------------------- | -------- | ----------- |
+| #12   | Backend: CRUD Usuarios                 | backend  | #8          |
+| #13   | Backend: CRUD Profesores               | backend  | #12         |
+| #14   | Backend: CRUD Alumnos                  | backend  | #12         |
+| #15   | Backend: CRUD Apoderados               | backend  | #12         |
+| #16   | Backend: Vinculación apoderado-alumno  | backend  | #14, #15    |
+| #21   | Frontend: Gestión de usuarios          | frontend | #11, #12    |
+| #22   | Frontend: Gestión de profesores        | frontend | #11, #13    |
+| #23   | Frontend: Gestión de alumnos           | frontend | #11, #14    |
+| #24   | Frontend: Gestión de apoderados        | frontend | #11, #15    |
+| #25   | Frontend: Vinculación apoderado-alumno | frontend | #11, #16    |
 
 #### Dev B — Cursos y estructura académica
 
-| Issue | Título | Tipo | Dependencia |
-|-------|--------|------|-------------|
-| #17 | Backend: CRUD Cursos | backend | #8 |
-| #18 | Backend: CRUD Asignaturas | backend | #8 |
-| #19 | Backend: Vinculación profesor-asignatura-curso | backend | #13, #17, #18 |
-| #20 | Backend: Vinculación alumno-curso | backend | #14, #17 |
-| #26 | Frontend: Gestión de cursos | frontend | #11, #17 |
-| #27 | Frontend: Gestión de asignaturas | frontend | #11, #18 |
-| #28 | Frontend: Vinculación profesor-asignatura-curso | frontend | #11, #19 |
-| #29 | Frontend: Vinculación alumno-curso | frontend | #11, #20 |
+| Issue | Título                                          | Tipo     | Dependencia   |
+| ----- | ----------------------------------------------- | -------- | ------------- |
+| #17   | Backend: CRUD Cursos                            | backend  | #8            |
+| #18   | Backend: CRUD Asignaturas                       | backend  | #8            |
+| #19   | Backend: Vinculación profesor-asignatura-curso  | backend  | #13, #17, #18 |
+| #20   | Backend: Vinculación alumno-curso               | backend  | #14, #17      |
+| #26   | Frontend: Gestión de cursos                     | frontend | #11, #17      |
+| #27   | Frontend: Gestión de asignaturas                | frontend | #11, #18      |
+| #28   | Frontend: Vinculación profesor-asignatura-curso | frontend | #11, #19      |
+| #29   | Frontend: Vinculación alumno-curso              | frontend | #11, #20      |
 
 > **Nota:** Issues #19 y #20 de Dev B dependen de issues de Dev A (#13, #14). Dev B puede empezar con #17 y #18 mientras Dev A avanza con #12-#15.
 
@@ -137,19 +139,19 @@ gestion_academica/
 
 #### Dev A — Archivos/Material
 
-| Issue | Título | Tipo | Dependencia |
-|-------|--------|------|-------------|
-| #30 | Backend: Subida y descarga de archivos | backend | #17, #18 |
-| #33 | Frontend: Gestión de materiales | frontend | #11, #30 |
+| Issue | Título                                 | Tipo     | Dependencia |
+| ----- | -------------------------------------- | -------- | ----------- |
+| #30   | Backend: Subida y descarga de archivos | backend  | #17, #18    |
+| #33   | Frontend: Gestión de materiales        | frontend | #11, #30    |
 
 #### Dev B — Evaluaciones y Notas
 
-| Issue | Título | Tipo | Dependencia |
-|-------|--------|------|-------------|
-| #31 | Backend: CRUD Evaluaciones | backend | #17, #18 |
-| #32 | Backend: Registro de notas y promedios | backend | #31, #14 |
-| #34 | Frontend: Gestión de evaluaciones | frontend | #11, #31 |
-| #35 | Frontend: Gestión de notas | frontend | #11, #32 |
+| Issue | Título                                 | Tipo     | Dependencia |
+| ----- | -------------------------------------- | -------- | ----------- |
+| #31   | Backend: CRUD Evaluaciones             | backend  | #17, #18    |
+| #32   | Backend: Registro de notas y promedios | backend  | #31, #14    |
+| #34   | Frontend: Gestión de evaluaciones      | frontend | #11, #31    |
+| #35   | Frontend: Gestión de notas             | frontend | #11, #32    |
 
 ---
 
