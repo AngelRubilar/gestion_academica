@@ -7,21 +7,24 @@
 <!-- Lista los cambios principales agrupados por área -->
 
 ### Archivos creados
+
 <!-- - `ruta/archivo.ts` — descripción breve -->
 
 ### Archivos modificados
+
 <!-- - `ruta/archivo.ts` — qué se cambió y por qué -->
 
 ### Archivos eliminados
+
 <!-- - `ruta/archivo.ts` — por qué se eliminó -->
 
 ## Cómo probar
 
 <!-- Pasos exactos para que el reviewer pueda verificar los cambios -->
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Checklist
 
