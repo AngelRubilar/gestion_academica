@@ -11,6 +11,9 @@ out/
 .env
 .env.local
 .env.*.local
+!.env.example
+docker/dev/.env
+docker/prod/.env
 
 # IDE
 .vscode/
