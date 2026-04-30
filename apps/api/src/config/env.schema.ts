@@ -21,7 +21,10 @@ export const envSchema = z.object({
   LOG_LEVEL: z
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
     .default('info'),
-  SWAGGER_ENABLED: z.coerce.boolean().default(true),
+  SWAGGER_ENABLED: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((s) => s === 'true'),
 });
 
 export type Env = z.infer<typeof envSchema>;

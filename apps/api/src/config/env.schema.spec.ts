@@ -42,6 +42,17 @@ describe('validateEnv', () => {
     expect(() => validateEnv({ ...baseEnv, JWT_SECRET: 'corto' })).toThrow(/JWT_SECRET/);
   });
 
+  it('parsea SWAGGER_ENABLED="false" como false', () => {
+    const result = validateEnv({ ...baseEnv, SWAGGER_ENABLED: 'false' });
+    expect(result.SWAGGER_ENABLED).toBe(false);
+  });
+
+  it('falla con SWAGGER_ENABLED inválido', () => {
+    expect(() =>
+      validateEnv({ ...baseEnv, SWAGGER_ENABLED: 'maybe' }),
+    ).toThrow(/SWAGGER_ENABLED/);
+  });
+
   it('falla con NODE_ENV inválido', () => {
     expect(() => validateEnv({ ...baseEnv, NODE_ENV: 'staging' })).toThrow(/NODE_ENV/);
   });
