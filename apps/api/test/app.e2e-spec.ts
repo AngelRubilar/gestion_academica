@@ -1,11 +1,9 @@
-import { INestApplication, VersioningType } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import compression from 'compression';
-import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 import request from 'supertest';
+import { configureApp } from '../src/app.config';
 import { AppModule } from '../src/app.module';
 import type { Env } from '../src/config/env.schema';
 import { TestFixturesModule } from './test-fixtures.module';
@@ -20,29 +18,9 @@ describe('App (e2e)', () => {
 
     app = moduleRef.createNestApplication({ bufferLogs: true });
     app.useLogger(app.get(Logger));
-    app.enableShutdownHooks();
 
     const config = app.get<ConfigService<Env, true>>(ConfigService);
-
-    app.use(helmet({ contentSecurityPolicy: false }));
-    app.use(compression());
-    app.enableCors({
-      origin: config.get('CORS_ORIGINS', { infer: true }),
-      credentials: true,
-    });
-    app.setGlobalPrefix('api', { exclude: ['/health'] });
-    app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
-
-    const swaggerConfig = new DocumentBuilder()
-      .setTitle('Gestión Académica API')
-      .setDescription('API del sistema de gestión académica')
-      .setVersion('1.0')
-      .addBearerAuth()
-      .build();
-    const document = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup('api/docs', app, document, {
-      jsonDocumentUrl: 'api/docs-json',
-    });
+    configureApp(app, config);
 
     await app.init();
   });
@@ -90,6 +68,7 @@ describe('App (e2e)', () => {
     expect(res.body).toMatchObject({
       statusCode: 404,
       error: 'Not Found',
+      message: expect.any(String),
       path: '/api/v1/__nope',
     });
     expect(res.body.timestamp).toMatch(/\d{4}-\d{2}-\d{2}T/);
