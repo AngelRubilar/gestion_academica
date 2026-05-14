@@ -13,13 +13,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   app.useLogger(app.get(Logger));
+  app.enableShutdownHooks();
 
   const config = app.get<ConfigService<Env, true>>(ConfigService);
   const swaggerEnabled = config.get('SWAGGER_ENABLED', { infer: true });
 
   app.use(
     helmet({
-      // Swagger UI relies on inline scripts/styles that helmet's default CSP blocks.
+      // Swagger UI requires inline scripts/styles that helmet's default CSP blocks.
+      // Safe to disable globally: this is a JSON API with no HTML routes outside /api/docs.
       contentSecurityPolicy: swaggerEnabled ? false : undefined,
     }),
   );
