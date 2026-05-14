@@ -55,7 +55,7 @@ jobs:
           DATABASE_URL: postgresql://user:pass@localhost:5432/db
 
       - name: TypeScript
-        run: pnpm exec tsc --noEmit
+        run: pnpm exec tsc --noEmit -p apps/api/tsconfig.json
 
   format:
     name: Format
