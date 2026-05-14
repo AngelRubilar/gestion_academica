@@ -1,4 +1,5 @@
 import { ExecutionContext } from '@nestjs/common';
+import type { RequestUser } from '../types/request-user';
 import { extractCurrentUser } from './current-user.decorator';
 
 function makeCtx(user: unknown) {
@@ -23,6 +24,9 @@ describe('CurrentUser decorator (extractor)', () => {
   });
 
   it('devuelve undefined si hay user pero el campo no existe', () => {
-    expect(extractCurrentUser('nope' as never, makeCtx({ id: 'x' }))).toBeUndefined();
+    // 'nope' is intentionally not a key of RequestUser — tests the missing-key runtime path.
+    expect(
+      extractCurrentUser('nope' as keyof RequestUser, makeCtx({ id: 'x' })),
+    ).toBeUndefined();
   });
 });

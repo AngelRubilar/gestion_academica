@@ -15,6 +15,7 @@ function makeCtx(user: unknown) {
 
 describe('RolesGuard', () => {
   function makeGuard(metadata: unknown) {
+    // Mocked Reflector: we test guard logic in isolation from metadata storage.
     const reflector = {
       getAllAndOverride: jest.fn().mockReturnValue(metadata),
     } as unknown as Reflector;
@@ -34,6 +35,11 @@ describe('RolesGuard', () => {
   it('rechaza si no hay user en el request', () => {
     const { guard } = makeGuard(['ADMIN']);
     expect(guard.canActivate(makeCtx(undefined))).toBe(false);
+  });
+
+  it('rechaza si user es null en el request', () => {
+    const { guard } = makeGuard(['ADMIN']);
+    expect(guard.canActivate(makeCtx(null))).toBe(false);
   });
 
   it('rechaza si el rol del user no está en la lista permitida', () => {

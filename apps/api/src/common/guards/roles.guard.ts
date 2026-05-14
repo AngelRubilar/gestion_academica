@@ -4,6 +4,11 @@ import type { Role } from '@gestion-academica/shared';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import type { RequestUser } from '../types/request-user';
 
+/**
+ * STUB — requiere que un guard previo (JwtAuthGuard, issue #6) pueble
+ * `request.user`. Sin ese guard, `request.user` es siempre `undefined` y
+ * este guard deniega todo endpoint protegido con `@Roles()`.
+ */
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
