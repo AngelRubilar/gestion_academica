@@ -1,0 +1,15 @@
+# Configuración de gitleaks — escaneo de secretos.
+# Extiende la configuración por defecto y agrega un allowlist para
+# archivos que legítimamente contienen valores de ejemplo o fixtures
+# (no secretos reales): tests, .env.example y documentación.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Fixtures de test, .env.example y docs — valores de ejemplo, no secretos reales"
+paths = [
+  '''.*spec\.ts$''',
+  '''.*\.env\.example$''',
+  '''docs/.*''',
+]
