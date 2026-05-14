@@ -8,12 +8,12 @@ export interface ResponseEnvelope<T> {
 
 @Injectable()
 export class TransformInterceptor<T>
-  implements NestInterceptor<T, ResponseEnvelope<T>>
+  implements NestInterceptor<T, ResponseEnvelope<T | null>>
 {
   intercept(
     _context: ExecutionContext,
     next: CallHandler<T>,
-  ): Observable<ResponseEnvelope<T>> {
-    return next.handle().pipe(map((data) => ({ data })));
+  ): Observable<ResponseEnvelope<T | null>> {
+    return next.handle().pipe(map((data) => ({ data: data ?? null })));
   }
 }

@@ -31,4 +31,8 @@ describe('TransformInterceptor', () => {
   it('envuelve un objeto en {data}', async () => {
     expect(await intercept({ id: 1 })).toEqual({ data: { id: 1 } });
   });
+
+  it('envuelve undefined en {data: null}', async () => {
+    expect(await intercept(undefined)).toEqual({ data: null });
+  });
 });
