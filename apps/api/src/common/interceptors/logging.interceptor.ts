@@ -21,7 +21,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap(() => {
-        this.logger.info({
+        this.logger.debug({
           method: req.method,
           url: req.url,
           ms: Date.now() - start,

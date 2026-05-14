@@ -9,22 +9,34 @@ function makeContext(req: { method: string; url: string }) {
 }
 
 describe('LoggingInterceptor', () => {
-  let logger: { setContext: jest.Mock; info: jest.Mock; warn: jest.Mock; error: jest.Mock };
+  let logger: {
+    setContext: jest.Mock;
+    debug: jest.Mock;
+    info: jest.Mock;
+    warn: jest.Mock;
+    error: jest.Mock;
+  };
   let interceptor: LoggingInterceptor;
 
   beforeEach(() => {
-    logger = { setContext: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() };
+    logger = {
+      setContext: jest.fn(),
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    };
     interceptor = new LoggingInterceptor(logger as never);
   });
 
-  it('loguea método/url/ms en éxito', async () => {
+  it('loguea método/url/ms en éxito (nivel debug)', async () => {
     const ctx = makeContext({ method: 'GET', url: '/foo' });
     const handler: CallHandler = { handle: () => of('ok') };
 
     await firstValueFrom(interceptor.intercept(ctx, handler));
 
-    expect(logger.info).toHaveBeenCalledTimes(1);
-    const arg = logger.info.mock.calls[0][0];
+    expect(logger.debug).toHaveBeenCalledTimes(1);
+    const arg = logger.debug.mock.calls[0][0];
     expect(arg).toMatchObject({ method: 'GET', url: '/foo', status: 'ok' });
     expect(typeof arg.ms).toBe('number');
   });
@@ -46,7 +58,7 @@ describe('LoggingInterceptor', () => {
     });
   });
 
-  it('loguea como error en excepción no HTTP y re-lanza', async () => {
+  it('loguea como error en excepción no HTTP, con payload completo, y re-lanza', async () => {
     const ctx = makeContext({ method: 'GET', url: '/baz' });
     const exc = new Error('boom');
     const handler: CallHandler = { handle: () => throwError(() => exc) };
@@ -55,5 +67,9 @@ describe('LoggingInterceptor', () => {
       firstValueFrom(interceptor.intercept(ctx, handler)),
     ).rejects.toBe(exc);
     expect(logger.error).toHaveBeenCalledTimes(1);
+    const arg = logger.error.mock.calls[0][0];
+    expect(arg).toMatchObject({ method: 'GET', url: '/baz', status: 'err' });
+    expect(arg.err).toBe(exc);
+    expect(typeof arg.ms).toBe('number');
   });
 });
