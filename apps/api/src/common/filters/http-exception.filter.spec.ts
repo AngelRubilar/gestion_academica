@@ -1,4 +1,4 @@
-import { ArgumentsHost, BadRequestException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { ArgumentsHost, BadRequestException, HttpException, HttpStatus, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { HttpExceptionFilter } from './http-exception.filter';
 
 function makeHost(req: { url?: string } = {}) {
@@ -6,21 +6,28 @@ function makeHost(req: { url?: string } = {}) {
   const status = jest.fn().mockReturnValue({ json });
   const response = { status };
   const request = { url: req.url ?? '/test' };
-  const host: Partial<ArgumentsHost> = {
-    switchToHttp: () =>
-      ({
-        getResponse: () => response,
-        getRequest: () => request,
-      }) as never,
-  };
-  return { host: host as ArgumentsHost, status, json };
+  const host = {
+    switchToHttp: () => ({
+      getResponse: () => response,
+      getRequest: () => request,
+    }),
+  } as unknown as ArgumentsHost;
+  return { host, status, json };
 }
 
 describe('HttpExceptionFilter', () => {
   let filter: HttpExceptionFilter;
+  let logErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
     filter = new HttpExceptionFilter();
+    logErrorSpy = jest
+      .spyOn(filter['logger'], 'error')
+      .mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    logErrorSpy.mockRestore();
   });
 
   it('transforma HttpException en formato uniforme', () => {
@@ -59,7 +66,7 @@ describe('HttpExceptionFilter', () => {
     );
   });
 
-  it('convierte error genérico en 500 sin exponer stack', () => {
+  it('convierte error genérico en 500 sin exponer stack y lo loguea', () => {
     const { host, status, json } = makeHost({ url: '/foo' });
     const exc = new Error('boom');
 
@@ -71,6 +78,7 @@ describe('HttpExceptionFilter', () => {
     expect(body.message).toBe('Internal server error');
     expect(body.error).toBe('Internal Server Error');
     expect(body).not.toHaveProperty('stack');
+    expect(logErrorSpy).toHaveBeenCalledWith('boom', expect.any(String));
   });
 
   it('maneja HttpException con response como string', () => {
@@ -83,7 +91,29 @@ describe('HttpExceptionFilter', () => {
       expect.objectContaining({
         statusCode: 403,
         message: 'error simple',
+        error: 'Forbidden',
       }),
     );
+  });
+
+  it('loguea las HttpException con status 5xx', () => {
+    const { host, status } = makeHost();
+    const exc = new InternalServerErrorException('db down');
+
+    filter.catch(exc, host);
+
+    expect(status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(logErrorSpy).toHaveBeenCalled();
+    expect(logErrorSpy.mock.calls[0][0]).toContain('500');
+  });
+
+  it('maneja throw de valor primitivo como 500', () => {
+    const { host, status, json } = makeHost();
+
+    filter.catch('algo raro', host);
+
+    expect(status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(json.mock.calls[0][0].message).toBe('Internal server error');
+    expect(logErrorSpy).toHaveBeenCalled();
   });
 });

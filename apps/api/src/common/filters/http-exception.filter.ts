@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { STATUS_CODES } from 'node:http';
 
 interface ErrorBody {
   statusCode: number;
@@ -34,11 +35,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const res = exception.getResponse();
       if (typeof res === 'string') {
         message = res;
-        error = exception.name.replace(/Exception$/, '');
+        error = STATUS_CODES[status] ?? 'Error';
       } else {
         const obj = res as { message?: string | string[]; error?: string };
         message = obj.message ?? exception.message;
-        error = obj.error ?? exception.name.replace(/Exception$/, '');
+        error = obj.error ?? STATUS_CODES[status] ?? 'Error';
+      }
+      if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+        this.logger.error(
+          `HttpException ${status}: ${exception.message}`,
+          exception.stack,
+        );
       }
     } else if (exception instanceof Error) {
       this.logger.error(exception.message, exception.stack);
@@ -51,7 +58,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message,
       error,
       timestamp: new Date().toISOString(),
-      path: request.url,
+      path: request?.url ?? 'unknown',
     };
 
     response.status(status).json(body);
