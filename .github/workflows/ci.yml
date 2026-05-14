@@ -26,6 +26,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma Client
+        run: pnpm --filter api prisma:generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+
       - name: ESLint
         run: pnpm lint
 
@@ -43,6 +48,11 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter api prisma:generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
 
       - name: TypeScript
         run: pnpm exec tsc --noEmit
@@ -79,6 +89,11 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter api prisma:generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
 
       - name: Run tests
         run: pnpm test
