@@ -13,12 +13,12 @@ Esta PR construye esa capa común para que cualquier CRUD posterior (#12–#20, 
 
 ## Decisiones de brainstorming
 
-| # | Pregunta | Decisión | Por qué |
-|---|---|---|---|
-| 1 | Rama base | **B** — desde `feature/3-schema-prisma` | `PrismaService` necesita el schema (PR #82). El equipo es solo Angel ahora, así que apilar PRs es seguro. |
-| 2 | Alcance | **C** — issue completa + todos los extras | API queda lista para producción mínima desde el día 1. Los extras son baratos ahora, caros después. |
-| 3 | Tests | **C** — unit por componente + E2E + smoke | Los componentes comunes son código que va a usar todo el equipo; tests aíslan regresiones. |
-| 4 | Registro de globals | **Opción 2** — `APP_*` providers en `AppModule` | Los componentes globales necesitan DI (`PrismaService`, `Logger`, `Reflector`). Registrarlos en `main.ts` impide DI. |
+| #   | Pregunta            | Decisión                                        | Por qué                                                                                                              |
+| --- | ------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 1   | Rama base           | **B** — desde `feature/3-schema-prisma`         | `PrismaService` necesita el schema (PR #82). El equipo es solo Angel ahora, así que apilar PRs es seguro.            |
+| 2   | Alcance             | **C** — issue completa + todos los extras       | API queda lista para producción mínima desde el día 1. Los extras son baratos ahora, caros después.                  |
+| 3   | Tests               | **C** — unit por componente + E2E + smoke       | Los componentes comunes son código que va a usar todo el equipo; tests aíslan regresiones.                           |
+| 4   | Registro de globals | **Opción 2** — `APP_*` providers en `AppModule` | Los componentes globales necesitan DI (`PrismaService`, `Logger`, `Reflector`). Registrarlos en `main.ts` impide DI. |
 
 ## Estructura final de archivos
 
@@ -91,7 +91,7 @@ async function bootstrap() {
   // CORS desde env
   const config = app.get(ConfigService);
   app.enableCors({
-    origin: config.get('CORS_ORIGINS', { infer: true }),  // ya viene como string[]
+    origin: config.get('CORS_ORIGINS', { infer: true }), // ya viene como string[]
     credentials: true,
   });
 
@@ -123,21 +123,22 @@ bootstrap();
 @Module({
   imports: [
     ConfigModule.forRoot({
-      validate: validateEnv,           // Zod
+      validate: validateEnv, // Zod
       isGlobal: true,
     }),
-    LoggerModule.forRoot({             // nestjs-pino
+    LoggerModule.forRoot({
+      // nestjs-pino
       pinoHttp: {
-        transport: process.env.NODE_ENV === 'development'
-          ? { target: 'pino-pretty' }
-          : undefined,
+        transport: process.env.NODE_ENV === 'development' ? { target: 'pino-pretty' } : undefined,
         redact: ['req.headers.authorization', 'req.headers.cookie'],
       },
     }),
-    ThrottlerModule.forRoot([{
-      ttl: 60_000,
-      limit: 100,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000,
+        limit: 100,
+      },
+    ]),
     PrismaModule,
     HealthModule,
   ],
@@ -151,10 +152,10 @@ bootstrap();
         transformOptions: { enableImplicitConversion: true },
       }),
     },
-    { provide: APP_FILTER,      useClass: HttpExceptionFilter },
+    { provide: APP_FILTER, useClass: HttpExceptionFilter },
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
-    { provide: APP_GUARD,       useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}
@@ -176,7 +177,8 @@ export const envSchema = z.object({
 
   DATABASE_URL: z.string().url(),
 
-  CORS_ORIGINS: z.string()
+  CORS_ORIGINS: z
+    .string()
     .default('http://localhost:3000')
     .transform((s) => s.split(',').map((o) => o.trim())),
 
@@ -185,7 +187,7 @@ export const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 
   THROTTLE_TTL_MS: z.coerce.number().int().positive().default(60_000),
-  THROTTLE_LIMIT:  z.coerce.number().int().positive().default(100),
+  THROTTLE_LIMIT: z.coerce.number().int().positive().default(100),
 
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   SWAGGER_ENABLED: z.coerce.boolean().default(true),
@@ -263,10 +265,10 @@ export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (!requiredRoles?.length) return true;
 
     const { user } = context.switchToHttp().getRequest();
@@ -317,21 +319,24 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   constructor(config: ConfigService<Env, true>) {
     super({
       datasources: { db: { url: config.get('DATABASE_URL', { infer: true }) } },
-      log: config.get('NODE_ENV', { infer: true }) === 'development'
-        ? ['warn', 'error']
-        : ['error'],
+      log:
+        config.get('NODE_ENV', { infer: true }) === 'development' ? ['warn', 'error'] : ['error'],
     });
   }
 
-  async onModuleInit()    { await this.$connect(); }
-  async onModuleDestroy() { await this.$disconnect(); }
+  async onModuleInit() {
+    await this.$connect();
+  }
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
 }
 
 // prisma/prisma.module.ts
 @Global()
 @Module({
   providers: [PrismaService],
-  exports:   [PrismaService],
+  exports: [PrismaService],
 })
 export class PrismaModule {}
 ```
@@ -352,9 +357,7 @@ export class HealthController {
   @Get()
   @HealthCheck()
   check() {
-    return this.health.check([
-      () => this.db.pingCheck('database'),
-    ]);
+    return this.health.check([() => this.db.pingCheck('database')]);
   }
 }
 ```
@@ -365,14 +368,14 @@ export class HealthController {
 
 ### Unit (Jest, mocks)
 
-| Archivo | Casos |
-|---|---|
-| `http-exception.filter.spec.ts` | `HttpException` → formato uniforme; error genérico → 500 sin exponer stack; preserva `path` y `timestamp` |
-| `transform.interceptor.spec.ts` | string → `{ data: 'x' }`; array → `{ data: [...] }`; null → `{ data: null }` |
-| `logging.interceptor.spec.ts` | Loggea método/url/ms en éxito; loggea como warn en error y re-lanza |
-| `roles.guard.spec.ts` | Sin `@Roles` → pasa; rol correcto → pasa; rol incorrecto → rechaza; sin user → rechaza |
-| `current-user.decorator.spec.ts` | Devuelve `request.user`; con argumento `'id'` devuelve `user.id`; sin user → undefined |
-| `roles.decorator.spec.ts` | Metadata seteado correctamente |
+| Archivo                          | Casos                                                                                                     |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `http-exception.filter.spec.ts`  | `HttpException` → formato uniforme; error genérico → 500 sin exponer stack; preserva `path` y `timestamp` |
+| `transform.interceptor.spec.ts`  | string → `{ data: 'x' }`; array → `{ data: [...] }`; null → `{ data: null }`                              |
+| `logging.interceptor.spec.ts`    | Loggea método/url/ms en éxito; loggea como warn en error y re-lanza                                       |
+| `roles.guard.spec.ts`            | Sin `@Roles` → pasa; rol correcto → pasa; rol incorrecto → rechaza; sin user → rechaza                    |
+| `current-user.decorator.spec.ts` | Devuelve `request.user`; con argumento `'id'` devuelve `user.id`; sin user → undefined                    |
+| `roles.decorator.spec.ts`        | Metadata seteado correctamente                                                                            |
 
 ### E2E (Supertest, app real)
 
@@ -424,7 +427,7 @@ Orden esperado de merge a `main`:
 
 1. **PR #84** (`docs: workflow del equipo, arquitectura y estilo de código`) → mergea primero. Aporta convenciones que el equipo aplicará en review.
 2. **PR #82** (`feat(db): schema Prisma`) → mergea segundo. Aporta el schema que `PrismaService` necesita.
-3. **PR de esta issue (#4)** → una vez ambas estén en `main`, esta rama se actualiza a `main` (siguiendo la convención del repo, que hasta ahora ha usado *merge commits* vía `gh pr merge`) y se abre PR contra `main`.
+3. **PR de esta issue (#4)** → una vez ambas estén en `main`, esta rama se actualiza a `main` (siguiendo la convención del repo, que hasta ahora ha usado _merge commits_ vía `gh pr merge`) y se abre PR contra `main`.
 
 ## Riesgos identificados
 

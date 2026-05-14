@@ -26,10 +26,7 @@ describe('validateEnv', () => {
       ...baseEnv,
       CORS_ORIGINS: 'http://localhost:3000, http://localhost:8081',
     });
-    expect(result.CORS_ORIGINS).toEqual([
-      'http://localhost:3000',
-      'http://localhost:8081',
-    ]);
+    expect(result.CORS_ORIGINS).toEqual(['http://localhost:3000', 'http://localhost:8081']);
   });
 
   it('falla si DATABASE_URL está ausente', () => {
@@ -48,9 +45,7 @@ describe('validateEnv', () => {
   });
 
   it('falla con SWAGGER_ENABLED inválido', () => {
-    expect(() =>
-      validateEnv({ ...baseEnv, SWAGGER_ENABLED: 'maybe' }),
-    ).toThrow(/SWAGGER_ENABLED/);
+    expect(() => validateEnv({ ...baseEnv, SWAGGER_ENABLED: 'maybe' })).toThrow(/SWAGGER_ENABLED/);
   });
 
   it('falla con NODE_ENV inválido', () => {

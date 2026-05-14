@@ -42,10 +42,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         error = obj.error ?? STATUS_CODES[status] ?? 'Error';
       }
       if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
-        this.logger.error(
-          `HttpException ${status}: ${exception.message}`,
-          exception.stack,
-        );
+        this.logger.error(`HttpException ${status}: ${exception.message}`, exception.stack);
       }
     } else if (exception instanceof Error) {
       this.logger.error(exception.message, exception.stack);

@@ -5,19 +5,14 @@ import { PrismaClient } from '@prisma/client';
 import type { Env } from '../config/env.schema';
 
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor(config: ConfigService<Env, true>) {
     super({
       adapter: new PrismaPg({
         connectionString: config.get('DATABASE_URL', { infer: true }),
       }),
       log:
-        config.get('NODE_ENV', { infer: true }) === 'development'
-          ? ['warn', 'error']
-          : ['error'],
+        config.get('NODE_ENV', { infer: true }) === 'development' ? ['warn', 'error'] : ['error'],
     });
   }
 

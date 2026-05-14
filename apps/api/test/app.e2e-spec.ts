@@ -36,9 +36,7 @@ describe('App (e2e)', () => {
   });
 
   it('GET /api/docs-json → spec OpenAPI con bearer auth declarado', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/api/docs-json')
-      .expect(200);
+    const res = await request(app.getHttpServer()).get('/api/docs-json').expect(200);
     expect(res.body.info.title).toBe('Gestión Académica API');
     expect(res.body.components.securitySchemes).toHaveProperty('bearer');
   });
@@ -48,23 +46,17 @@ describe('App (e2e)', () => {
       .options('/api/v1/__ok')
       .set('Origin', 'http://localhost:3000')
       .set('Access-Control-Request-Method', 'GET');
-    expect(res.headers['access-control-allow-origin']).toBe(
-      'http://localhost:3000',
-    );
+    expect(res.headers['access-control-allow-origin']).toBe('http://localhost:3000');
     expect(res.headers['access-control-allow-credentials']).toBe('true');
   });
 
   it('GET /api/v1/__ok → 200 con cuerpo {data:"ok"}', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/api/v1/__ok')
-      .expect(200);
+    const res = await request(app.getHttpServer()).get('/api/v1/__ok').expect(200);
     expect(res.body).toEqual({ data: 'ok' });
   });
 
   it('GET /api/v1/__nope → 404 con formato de error uniforme', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/api/v1/__nope')
-      .expect(404);
+    const res = await request(app.getHttpServer()).get('/api/v1/__nope').expect(404);
     expect(res.body).toMatchObject({
       statusCode: 404,
       error: 'Not Found',

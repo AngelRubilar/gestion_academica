@@ -1,4 +1,11 @@
-import { ArgumentsHost, BadRequestException, HttpException, HttpStatus, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { HttpExceptionFilter } from './http-exception.filter';
 
 function makeHost(req: { url?: string } = {}) {
@@ -21,9 +28,7 @@ describe('HttpExceptionFilter', () => {
 
   beforeEach(() => {
     filter = new HttpExceptionFilter();
-    logErrorSpy = jest
-      .spyOn(filter['logger'], 'error')
-      .mockImplementation(() => undefined);
+    logErrorSpy = jest.spyOn(filter['logger'], 'error').mockImplementation(() => undefined);
   });
 
   afterEach(() => {

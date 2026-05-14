@@ -46,9 +46,7 @@ describe('LoggingInterceptor', () => {
     const exc = new HttpException('nope', HttpStatus.FORBIDDEN);
     const handler: CallHandler = { handle: () => throwError(() => exc) };
 
-    await expect(
-      firstValueFrom(interceptor.intercept(ctx, handler)),
-    ).rejects.toBe(exc);
+    await expect(firstValueFrom(interceptor.intercept(ctx, handler))).rejects.toBe(exc);
     expect(logger.warn).toHaveBeenCalledTimes(1);
     expect(logger.warn.mock.calls[0][0]).toMatchObject({
       method: 'POST',
@@ -63,9 +61,7 @@ describe('LoggingInterceptor', () => {
     const exc = new Error('boom');
     const handler: CallHandler = { handle: () => throwError(() => exc) };
 
-    await expect(
-      firstValueFrom(interceptor.intercept(ctx, handler)),
-    ).rejects.toBe(exc);
+    await expect(firstValueFrom(interceptor.intercept(ctx, handler))).rejects.toBe(exc);
     expect(logger.error).toHaveBeenCalledTimes(1);
     const arg = logger.error.mock.calls[0][0];
     expect(arg).toMatchObject({ method: 'GET', url: '/baz', status: 'err' });

@@ -15,10 +15,7 @@ describe('PrismaHealthIndicator', () => {
     };
     healthIndicatorService = { check: jest.fn().mockReturnValue(indicator) };
     prisma = { $queryRaw: jest.fn() };
-    health = new PrismaHealthIndicator(
-      prisma as never,
-      healthIndicatorService as never,
-    );
+    health = new PrismaHealthIndicator(prisma as never, healthIndicatorService as never);
     jest.spyOn(health['logger'], 'error').mockImplementation(() => undefined);
   });
 
@@ -55,9 +52,6 @@ describe('PrismaHealthIndicator', () => {
 
     await health.pingCheck('database');
 
-    expect(health['logger'].error).toHaveBeenCalledWith(
-      'Database health check failed',
-      dbError,
-    );
+    expect(health['logger'].error).toHaveBeenCalledWith('Database health check failed', dbError);
   });
 });

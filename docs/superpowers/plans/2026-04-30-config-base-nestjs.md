@@ -23,12 +23,14 @@
 ## File map
 
 **Modificar:**
+
 - `apps/api/package.json` — añadir deps NestJS y reemplazar scripts placeholder
 - `apps/api/tsconfig.json` — overrides para CommonJS y decoradores
 - `apps/api/.env` — añadir variables nuevas
 - `apps/api/.gitignore` — asegurar que ignora `dist/`
 
 **Crear (root de la app):**
+
 - `apps/api/tsconfig.build.json` — excluye tests del build
 - `apps/api/nest-cli.json` — config del CLI de Nest
 - `apps/api/jest.config.ts` — config de unit tests
@@ -36,6 +38,7 @@
 - `apps/api/.env.example` — placeholder commiteable
 
 **Crear (src):**
+
 - `apps/api/src/main.ts`
 - `apps/api/src/app.module.ts`
 - `apps/api/src/config/env.schema.ts` (+ `.spec.ts`)
@@ -54,6 +57,7 @@
 - `apps/api/src/common/index.ts`
 
 **Crear (test E2E):**
+
 - `apps/api/test/jest-e2e.json` — opcional, alternativa a `.config.ts`
 - `apps/api/test/test-fixtures.module.ts` — `TestController` con `__ok`, `__notfound`, `__validate`
 - `apps/api/test/app.e2e-spec.ts`
@@ -72,6 +76,7 @@
 ### Task 1: Instalar dependencias y archivos de configuración
 
 **Files:**
+
 - Modify: `apps/api/package.json`
 - Modify: `apps/api/tsconfig.json`
 - Create: `apps/api/tsconfig.build.json`
@@ -286,6 +291,7 @@ git commit -m "chore(api): instalar dependencias NestJS y configurar build/test"
 Objetivo: dejar la API arrancando en puerto 3001 sin nada más, para validar que la cadena `nest start` → `tsc` → Node funciona antes de agregar lógica.
 
 **Files:**
+
 - Create: `apps/api/src/main.ts`
 - Create: `apps/api/src/app.module.ts`
 
@@ -341,6 +347,7 @@ git commit -m "feat(api): bootstrap mínimo de NestJS"
 ### Task 3: Validación del `.env` con Zod
 
 **Files:**
+
 - Create: `apps/api/src/config/env.schema.ts`
 - Create: `apps/api/src/config/env.schema.spec.ts`
 - Modify: `apps/api/src/app.module.ts`
@@ -378,10 +385,7 @@ describe('validateEnv', () => {
       ...baseEnv,
       CORS_ORIGINS: 'http://localhost:3000, http://localhost:8081',
     });
-    expect(result.CORS_ORIGINS).toEqual([
-      'http://localhost:3000',
-      'http://localhost:8081',
-    ]);
+    expect(result.CORS_ORIGINS).toEqual(['http://localhost:3000', 'http://localhost:8081']);
   });
 
   it('falla si DATABASE_URL está ausente', () => {
@@ -419,7 +423,12 @@ export const envSchema = z.object({
   CORS_ORIGINS: z
     .string()
     .default('http://localhost:3000')
-    .transform((s) => s.split(',').map((o) => o.trim()).filter(Boolean)),
+    .transform((s) =>
+      s
+        .split(',')
+        .map((o) => o.trim())
+        .filter(Boolean),
+    ),
 
   JWT_SECRET: z.string().min(32),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
@@ -428,9 +437,7 @@ export const envSchema = z.object({
   THROTTLE_TTL_MS: z.coerce.number().int().positive().default(60_000),
   THROTTLE_LIMIT: z.coerce.number().int().positive().default(100),
 
-  LOG_LEVEL: z
-    .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
-    .default('info'),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   SWAGGER_ENABLED: z.coerce.boolean().default(true),
 });
 
@@ -537,6 +544,7 @@ git commit -m "feat(api): validación tipada del .env con Zod"
 ### Task 4: PrismaModule global y PrismaService
 
 **Files:**
+
 - Create: `apps/api/src/prisma/prisma.service.ts`
 - Create: `apps/api/src/prisma/prisma.module.ts`
 - Modify: `apps/api/src/app.module.ts`
@@ -550,19 +558,14 @@ import { PrismaClient } from '@prisma/client';
 import type { Env } from '../config/env.schema';
 
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor(config: ConfigService<Env, true>) {
     super({
       datasources: {
         db: { url: config.get('DATABASE_URL', { infer: true }) },
       },
       log:
-        config.get('NODE_ENV', { infer: true }) === 'development'
-          ? ['warn', 'error']
-          : ['error'],
+        config.get('NODE_ENV', { infer: true }) === 'development' ? ['warn', 'error'] : ['error'],
     });
   }
 
@@ -634,6 +637,7 @@ git commit -m "feat(api): PrismaModule global con lifecycle hooks"
 ### Task 5: HttpExceptionFilter
 
 **Files:**
+
 - Create: `apps/api/src/common/filters/http-exception.filter.ts`
 - Create: `apps/api/src/common/filters/http-exception.filter.spec.ts`
 - Modify: `apps/api/src/app.module.ts`
@@ -642,7 +646,13 @@ git commit -m "feat(api): PrismaModule global con lifecycle hooks"
 
 ```ts
 // apps/api/src/common/filters/http-exception.filter.spec.ts
-import { ArgumentsHost, BadRequestException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
 import { HttpExceptionFilter } from './http-exception.filter';
 
 function makeHost(req: { url?: string } = {}) {
@@ -819,14 +829,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
-    PrismaModule,
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }), PrismaModule],
   controllers: [],
-  providers: [
-    { provide: APP_FILTER, useClass: HttpExceptionFilter },
-  ],
+  providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })
 export class AppModule {}
 ```
@@ -848,6 +853,7 @@ git commit -m "feat(api): HttpExceptionFilter global con formato uniforme"
 ### Task 6: TransformInterceptor
 
 **Files:**
+
 - Create: `apps/api/src/common/interceptors/transform.interceptor.ts`
 - Create: `apps/api/src/common/interceptors/transform.interceptor.spec.ts`
 - Modify: `apps/api/src/app.module.ts`
@@ -910,13 +916,8 @@ export interface ResponseEnvelope<T> {
 }
 
 @Injectable()
-export class TransformInterceptor<T>
-  implements NestInterceptor<T, ResponseEnvelope<T>>
-{
-  intercept(
-    _context: ExecutionContext,
-    next: CallHandler<T>,
-  ): Observable<ResponseEnvelope<T>> {
+export class TransformInterceptor<T> implements NestInterceptor<T, ResponseEnvelope<T>> {
+  intercept(_context: ExecutionContext, next: CallHandler<T>): Observable<ResponseEnvelope<T>> {
     return next.handle().pipe(map((data) => ({ data })));
   }
 }
@@ -956,6 +957,7 @@ git commit -m "feat(api): TransformInterceptor envuelve respuestas en {data}"
 ### Task 7: nestjs-pino + LoggingInterceptor
 
 **Files:**
+
 - Modify: `apps/api/src/app.module.ts`
 - Modify: `apps/api/src/main.ts`
 - Create: `apps/api/src/common/interceptors/logging.interceptor.ts`
@@ -1058,9 +1060,7 @@ describe('LoggingInterceptor', () => {
     const exc = new HttpException('nope', HttpStatus.FORBIDDEN);
     const handler: CallHandler = { handle: () => throwError(() => exc) };
 
-    await expect(
-      firstValueFrom(interceptor.intercept(ctx, handler)),
-    ).rejects.toBe(exc);
+    await expect(firstValueFrom(interceptor.intercept(ctx, handler))).rejects.toBe(exc);
     expect(logger.warn).toHaveBeenCalledTimes(1);
     expect(logger.warn.mock.calls[0][0]).toMatchObject({
       method: 'POST',
@@ -1075,9 +1075,7 @@ describe('LoggingInterceptor', () => {
     const exc = new Error('boom');
     const handler: CallHandler = { handle: () => throwError(() => exc) };
 
-    await expect(
-      firstValueFrom(interceptor.intercept(ctx, handler)),
-    ).rejects.toBe(exc);
+    await expect(firstValueFrom(interceptor.intercept(ctx, handler))).rejects.toBe(exc);
     expect(logger.error).toHaveBeenCalledTimes(1);
   });
 });
@@ -1181,6 +1179,7 @@ git commit -m "feat(api): logger pino y LoggingInterceptor"
 ### Task 8: Roles decorator + RolesGuard + CurrentUser decorator
 
 **Files:**
+
 - Create: `apps/api/src/common/types/request-user.ts`
 - Create: `apps/api/src/common/decorators/roles.decorator.ts`
 - Create: `apps/api/src/common/decorators/roles.decorator.spec.ts`
@@ -1323,10 +1322,10 @@ export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<Role[] | undefined>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<Role[] | undefined>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (!requiredRoles || requiredRoles.length === 0) return true;
 
     const request = context.switchToHttp().getRequest<{ user?: RequestUser }>();
@@ -1414,6 +1413,7 @@ git commit -m "feat(api): decoradores @Roles, @CurrentUser y RolesGuard stub"
 ### Task 9: ValidationPipe global
 
 **Files:**
+
 - Modify: `apps/api/src/app.module.ts`
 
 - [ ] **Step 1: Registrar `ValidationPipe` como `APP_PIPE`**
@@ -1453,6 +1453,7 @@ git commit -m "feat(api): ValidationPipe global con whitelist y transform"
 ### Task 10: ThrottlerModule global
 
 **Files:**
+
 - Modify: `apps/api/src/app.module.ts`
 
 - [ ] **Step 1: Importar `ThrottlerModule` y registrar `ThrottlerGuard` como `APP_GUARD`**
@@ -1492,6 +1493,7 @@ git commit -m "feat(api): rate limiting global con ThrottlerModule"
 ### Task 11: Helmet + compression + CORS + prefix + versioning en `main.ts`
 
 **Files:**
+
 - Modify: `apps/api/src/main.ts`
 
 - [ ] **Step 1: Reemplazar `main.ts` con la configuración completa de bootstrap (sin Swagger, que se agrega en Task 12)**
@@ -1540,10 +1542,13 @@ bootstrap();
 
 Run: `pnpm --filter api dev`
 En otra terminal:
+
 ```bash
 curl -i http://localhost:3001/api/v1/__nope
 ```
+
 Expected:
+
 - Status `404`
 - Header `X-DNS-Prefetch-Control: off` (helmet)
 - Header `Content-Encoding: gzip` (compression — solo si el response es grande, en 404 puede no aparecer)
@@ -1561,6 +1566,7 @@ git commit -m "feat(api): helmet, compression, CORS, prefix /api/v1 con versiona
 ### Task 12: Swagger en `/api/docs`
 
 **Files:**
+
 - Modify: `apps/api/src/main.ts`
 
 - [ ] **Step 1: Agregar setup de Swagger condicional en `main.ts`**
@@ -1589,9 +1595,11 @@ if (config.get('SWAGGER_ENABLED', { infer: true })) {
 
 Run: `pnpm --filter api dev`
 En el navegador o con curl:
+
 ```bash
 curl -i http://localhost:3001/api/docs-json | head -20
 ```
+
 Expected: JSON con `openapi: "3.0.0"`, `info.title: "Gestión Académica API"`, `components.securitySchemes.bearer`.
 
 Y `http://localhost:3001/api/docs` muestra la UI de Swagger.
@@ -1608,6 +1616,7 @@ git commit -m "feat(api): Swagger UI en /api/docs con bearer auth"
 ### Task 13: HealthModule con DB ping
 
 **Files:**
+
 - Create: `apps/api/src/health/prisma.health.ts`
 - Create: `apps/api/src/health/health.controller.ts`
 - Create: `apps/api/src/health/health.module.ts`
@@ -1693,10 +1702,13 @@ HealthModule,
 - [ ] **Step 5: Smoke — `/health` responde con DB up**
 
 Run: `pnpm --filter api dev`
+
 ```bash
 curl -s http://localhost:3001/health | jq
 ```
+
 Expected:
+
 ```json
 {
   "data": {
@@ -1722,6 +1734,7 @@ git commit -m "feat(api): healthcheck en /health con ping a la DB"
 ### Task 14: Tests E2E
 
 **Files:**
+
 - Create: `apps/api/test/test-fixtures.module.ts`
 - Create: `apps/api/test/app.e2e-spec.ts`
 
@@ -1807,9 +1820,7 @@ describe('App (e2e)', () => {
   });
 
   it('GET /api/docs-json → JSON spec con bearer auth declarado', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/api/docs-json')
-      .expect(200);
+    const res = await request(app.getHttpServer()).get('/api/docs-json').expect(200);
     expect(res.body.info.title).toBe('Gestión Académica API');
     expect(res.body.components.securitySchemes).toHaveProperty('bearer');
   });
@@ -1827,16 +1838,12 @@ describe('App (e2e)', () => {
   });
 
   it('GET /api/v1/__ok → 200 con cuerpo {data:"ok"}', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/api/v1/__ok')
-      .expect(200);
+    const res = await request(app.getHttpServer()).get('/api/v1/__ok').expect(200);
     expect(res.body).toEqual({ data: 'ok' });
   });
 
   it('GET /api/v1/__nope → 404 con formato uniforme', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/api/v1/__nope')
-      .expect(404);
+    const res = await request(app.getHttpServer()).get('/api/v1/__nope').expect(404);
     expect(res.body).toMatchObject({
       statusCode: 404,
       error: 'Not Found',
@@ -1872,6 +1879,7 @@ Run: `pnpm --filter api test:e2e`
 Expected: 7 tests PASS. Pre-condición: la BD de desarrollo está levantada (Postgres en 5432).
 
 Si el test de health falla por DB caída, levantar Docker:
+
 ```bash
 docker compose -f docker/dev/docker-compose.yml up -d postgres
 ```
@@ -1888,6 +1896,7 @@ git commit -m "test(api): suite E2E del bootstrap (health, swagger, CORS, transf
 ### Task 15: Barrel exports y verificación final
 
 **Files:**
+
 - Create: `apps/api/src/common/index.ts`
 
 - [ ] **Step 1: Crear el barrel `common/index.ts`**

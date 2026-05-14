@@ -15,10 +15,7 @@ import type { Env } from './config/env.schema';
  * NO incluye: creación de la app, `useLogger`, `enableShutdownHooks` ni
  * `listen` — esos son responsabilidad del proceso que arranca la app.
  */
-export function configureApp(
-  app: INestApplication,
-  config: ConfigService<Env, true>,
-): void {
+export function configureApp(app: INestApplication, config: ConfigService<Env, true>): void {
   const swaggerEnabled = config.get('SWAGGER_ENABLED', { infer: true });
 
   app.use(

@@ -25,8 +25,6 @@ describe('CurrentUser decorator (extractor)', () => {
 
   it('devuelve undefined si hay user pero el campo no existe', () => {
     // 'nope' is intentionally not a key of RequestUser — tests the missing-key runtime path.
-    expect(
-      extractCurrentUser('nope' as keyof RequestUser, makeCtx({ id: 'x' })),
-    ).toBeUndefined();
+    expect(extractCurrentUser('nope' as keyof RequestUser, makeCtx({ id: 'x' }))).toBeUndefined();
   });
 });
