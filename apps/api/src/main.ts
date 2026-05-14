@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import compression from 'compression';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
@@ -13,10 +14,16 @@ async function bootstrap() {
 
   app.useLogger(app.get(Logger));
 
-  app.use(helmet());
-  app.use(compression());
+  const config = app.get<ConfigService<Env, true>>(ConfigService);
+  const swaggerEnabled = config.get('SWAGGER_ENABLED', { infer: true });
 
-  const config = app.get(ConfigService) as ConfigService<Env, true>;
+  app.use(
+    helmet({
+      // Swagger UI relies on inline scripts/styles that helmet's default CSP blocks.
+      contentSecurityPolicy: swaggerEnabled ? false : undefined,
+    }),
+  );
+  app.use(compression());
 
   app.enableCors({
     origin: config.get('CORS_ORIGINS', { infer: true }),
@@ -29,7 +36,25 @@ async function bootstrap() {
     defaultVersion: '1',
   });
 
+  if (swaggerEnabled) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Gestión Académica API')
+      .setDescription('API del sistema de gestión académica')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document, {
+      jsonDocumentUrl: 'api/docs-json',
+    });
+  }
+
   const port = config.get('PORT', { infer: true });
   await app.listen(port);
 }
-bootstrap();
+
+bootstrap().catch((err) => {
+  // Logger isn't available if bootstrap fails before useLogger — fall back to console.
+  console.error('Fatal bootstrap error', err);
+  process.exit(1);
+});
