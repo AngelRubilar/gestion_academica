@@ -180,8 +180,8 @@ Poseer el refresh token basta para invalidarlo.
 - sha256 (no bcrypt) porque el token es aleatorio de alta entropía: no necesita
   hash lento y permite lookup directo indexado por hash. bcrypt queda reservado
   para passwords (baja entropía, requiere hash lento).
-- `expiresAt = now + JWT_REFRESH_EXPIRES_IN`; el `"7d"` se parsea con el paquete
-  `ms`.
+- `expiresAt = now + JWT_REFRESH_EXPIRES_IN`; el `"7d"` se parsea con un helper
+  local `parseDuration` (regex simple, sin dependencia externa).
 - **Rotación:** al rotar se setea `revokedAt` en el token viejo (no se borra) y se
   crea uno nuevo. Así un token reusado se detecta.
 - **Detección de reuso:** si llega un token cuyo registro tiene `revokedAt`
@@ -216,8 +216,8 @@ model RefreshToken {
 ## Dependencias
 
 - **Agregar a `dependencies`:** `@nestjs/jwt`, `@nestjs/passport`, `passport`,
-  `passport-jwt`, `ms`.
-- **Agregar a `devDependencies`:** `@types/passport-jwt`, `@types/ms`.
+  `passport-jwt`.
+- **Agregar a `devDependencies`:** `@types/passport-jwt`.
 - **Mover** `bcrypt` de `devDependencies` → `dependencies` (el `AuthService` lo usa
   en runtime; hoy solo funciona porque el seed corre con ts-node). `@types/bcrypt`
   se queda en `devDependencies`.
