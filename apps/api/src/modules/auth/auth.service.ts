@@ -12,6 +12,7 @@ import type { RequestUser } from '../../common/types/request-user';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { LoginDto } from './dto/login.dto';
 import type { LogoutDto } from './dto/logout.dto';
+import type { RefreshDto } from './dto/refresh.dto';
 import type { RegisterDto } from './dto/register.dto';
 import { RefreshTokenService } from './refresh-token.service';
 import type { JwtPayload } from './strategies/jwt.strategy';
@@ -80,6 +81,15 @@ export class AuthService {
 
   async logout(dto: LogoutDto): Promise<void> {
     await this.refreshTokens.revoke(dto.refreshToken);
+  }
+
+  async refresh(dto: RefreshDto): Promise<AuthTokens> {
+    const userId = await this.refreshTokens.consume(dto.refreshToken);
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('Refresh token inválido');
+    }
+    return this.issueTokens({ id: user.id, email: user.email, role: user.role });
   }
 
   private async issueTokens(user: RequestUser): Promise<AuthTokens> {

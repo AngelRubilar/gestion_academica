@@ -155,4 +155,60 @@ describe('AuthService', () => {
       expect(refreshTokens.revoke).toHaveBeenCalledWith('raw-refresh-token');
     });
   });
+
+  describe('refresh', () => {
+    it('rota los tokens: consume el viejo y emite uno nuevo', async () => {
+      refreshTokens.consume.mockResolvedValue('u1');
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'u1',
+        email: 'user@b.cl',
+        role: 'PROFESOR',
+        isActive: true,
+      });
+      jwt.sign.mockReturnValue('nuevo-access-token');
+      refreshTokens.issue.mockResolvedValue('nuevo-refresh-token');
+
+      const result = await service.refresh({ refreshToken: 'viejo-refresh-token' });
+
+      expect(refreshTokens.consume).toHaveBeenCalledWith('viejo-refresh-token');
+      expect(result).toEqual({
+        accessToken: 'nuevo-access-token',
+        refreshToken: 'nuevo-refresh-token',
+      });
+    });
+
+    it('propaga el error si consume rechaza el token (inválido / reuso)', async () => {
+      refreshTokens.consume.mockRejectedValue(new Error('Refresh token inválido'));
+
+      await expect(
+        service.refresh({ refreshToken: 'token-malo' }),
+      ).rejects.toThrow('Refresh token inválido');
+      expect(refreshTokens.issue).not.toHaveBeenCalled();
+    });
+
+    it('lanza UnauthorizedException si el usuario ya no existe', async () => {
+      refreshTokens.consume.mockResolvedValue('u1');
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.refresh({ refreshToken: 'viejo-refresh-token' }),
+      ).rejects.toThrow('Refresh token inválido');
+      expect(refreshTokens.issue).not.toHaveBeenCalled();
+    });
+
+    it('lanza UnauthorizedException si el usuario está inactivo', async () => {
+      refreshTokens.consume.mockResolvedValue('u1');
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'u1',
+        email: 'user@b.cl',
+        role: 'PROFESOR',
+        isActive: false,
+      });
+
+      await expect(
+        service.refresh({ refreshToken: 'viejo-refresh-token' }),
+      ).rejects.toThrow('Refresh token inválido');
+      expect(refreshTokens.issue).not.toHaveBeenCalled();
+    });
+  });
 });
