@@ -88,4 +88,71 @@ describe('AuthService', () => {
       ).resolves.toBeDefined();
     });
   });
+
+  describe('login', () => {
+    const PASSWORD = 'correcta1';
+    const passwordHash = bcrypt.hashSync(PASSWORD, 10);
+
+    function mockUser(overrides: Record<string, unknown> = {}) {
+      return {
+        id: 'u1',
+        email: 'user@b.cl',
+        password: passwordHash,
+        role: 'PROFESOR',
+        isActive: true,
+        ...overrides,
+      };
+    }
+
+    it('devuelve access token, refresh token y los datos del usuario', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser());
+      jwt.sign.mockReturnValue('signed-access-token');
+      refreshTokens.issue.mockResolvedValue('raw-refresh-token');
+
+      const result = await service.login({ email: 'user@b.cl', password: PASSWORD });
+
+      expect(result).toEqual({
+        accessToken: 'signed-access-token',
+        refreshToken: 'raw-refresh-token',
+        user: { id: 'u1', email: 'user@b.cl', role: 'PROFESOR' },
+      });
+      expect(jwt.sign).toHaveBeenCalledWith({ sub: 'u1', email: 'user@b.cl', role: 'PROFESOR' });
+      expect(refreshTokens.issue).toHaveBeenCalledWith('u1');
+    });
+
+    it('lanza UnauthorizedException si el password es incorrecto', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser());
+
+      await expect(
+        service.login({ email: 'user@b.cl', password: 'incorrecta' }),
+      ).rejects.toThrow('Credenciales inválidas');
+      expect(refreshTokens.issue).not.toHaveBeenCalled();
+    });
+
+    it('lanza UnauthorizedException si el email no existe', async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.login({ email: 'noexiste@b.cl', password: PASSWORD }),
+      ).rejects.toThrow('Credenciales inválidas');
+    });
+
+    it('lanza UnauthorizedException si el usuario está inactivo', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser({ isActive: false }));
+
+      await expect(
+        service.login({ email: 'user@b.cl', password: PASSWORD }),
+      ).rejects.toThrow('Credenciales inválidas');
+    });
+  });
+
+  describe('logout', () => {
+    it('revoca el refresh token recibido', async () => {
+      refreshTokens.revoke.mockResolvedValue(undefined);
+
+      await service.logout({ refreshToken: 'raw-refresh-token' });
+
+      expect(refreshTokens.revoke).toHaveBeenCalledWith('raw-refresh-token');
+    });
+  });
 });
