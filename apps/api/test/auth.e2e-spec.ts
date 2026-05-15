@@ -14,6 +14,8 @@ const SUPERADMIN_EMAIL = `superadmin${TEST_EMAIL_DOMAIN}`;
 const SUPERADMIN_PASSWORD = 'superadmin-e2e-pass';
 const PROFESOR_EMAIL = `profesor${TEST_EMAIL_DOMAIN}`;
 const PROFESOR_PASSWORD = 'profesor-e2e-pass';
+const ADMIN_EMAIL = `admin${TEST_EMAIL_DOMAIN}`;
+const ADMIN_PASSWORD = 'admin-e2e-pass';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
@@ -44,6 +46,13 @@ describe('Auth (e2e)', () => {
         email: PROFESOR_EMAIL,
         password: await bcrypt.hash(PROFESOR_PASSWORD, 10),
         role: 'PROFESOR',
+      },
+    });
+    await prisma.user.create({
+      data: {
+        email: ADMIN_EMAIL,
+        password: await bcrypt.hash(ADMIN_PASSWORD, 10),
+        role: 'ADMIN',
       },
     });
   });
@@ -96,6 +105,21 @@ describe('Auth (e2e)', () => {
       .post('/api/v1/auth/register')
       .set('Authorization', `Bearer ${login.body.data.accessToken}`)
       .send({ email: `nuevo${TEST_EMAIL_DOMAIN}`, password: 'secret1', role: 'PROFESOR' })
+      .expect(403);
+  });
+
+  it('POST /api/v1/auth/register: un ADMIN no puede crear un SUPER_ADMIN → 403', async () => {
+    const server = request(app.getHttpServer());
+
+    const login = await server
+      .post('/api/v1/auth/login')
+      .send({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD })
+      .expect(200);
+
+    await server
+      .post('/api/v1/auth/register')
+      .set('Authorization', `Bearer ${login.body.data.accessToken}`)
+      .send({ email: `superadmin-nuevo${TEST_EMAIL_DOMAIN}`, password: 'secret1', role: 'SUPER_ADMIN' })
       .expect(403);
   });
 

@@ -5,9 +5,9 @@ import { ROLES_KEY } from '../decorators/roles.decorator';
 import type { RequestUser } from '../types/request-user';
 
 /**
- * STUB — requiere que un guard previo (JwtAuthGuard, issue #6) pueble
- * `request.user`. Sin ese guard, `request.user` es siempre `undefined` y
- * este guard deniega todo endpoint protegido con `@Roles()`.
+ * Requiere que `JwtAuthGuard` corra antes para poblar `request.user`.
+ * Si no hay user (ningún guard de auth previo, o falló), deniega.
+ * Uso: `@UseGuards(JwtAuthGuard, RolesGuard)`.
  */
 @Injectable()
 export class RolesGuard implements CanActivate {
