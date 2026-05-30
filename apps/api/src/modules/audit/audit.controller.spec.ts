@@ -20,7 +20,14 @@ describe('AuditController', () => {
     const query = { entityType: 'User', page: 1, pageSize: 20 } as never;
     await expect(controller.list(query)).resolves.toBe(page);
     expect(auditService.findMany).toHaveBeenCalledWith(
-      { entityType: 'User', entityId: undefined, userId: undefined, action: undefined, from: undefined, to: undefined },
+      {
+        entityType: 'User',
+        entityId: undefined,
+        userId: undefined,
+        action: undefined,
+        from: undefined,
+        to: undefined,
+      },
       { page: 1, pageSize: 20 },
     );
   });

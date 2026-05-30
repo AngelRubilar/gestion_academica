@@ -18,15 +18,10 @@ export function auditExtension(auditContext: AuditContextService) {
     // Los helpers se definen DENTRO del callback de defineExtension para que
     // cierren correctamente sobre `client`.
 
-    function delegate(
-      model: string,
-    ): { findUnique: (a: unknown) => Promise<Row | null> } {
+    function delegate(model: string): { findUnique: (a: unknown) => Promise<Row | null> } {
       const key = model.charAt(0).toLowerCase() + model.slice(1);
       return (
-        client as unknown as Record<
-          string,
-          { findUnique: (a: unknown) => Promise<Row | null> }
-        >
+        client as unknown as Record<string, { findUnique: (a: unknown) => Promise<Row | null> }>
       )[key];
     }
 
@@ -71,9 +66,7 @@ export function auditExtension(auditContext: AuditContextService) {
             userAgent: ctx.userAgent,
           },
         })
-        .catch((err: unknown) =>
-          logger.error(`No se pudo escribir el audit log de ${model}`, err),
-        );
+        .catch((err: unknown) => logger.error(`No se pudo escribir el audit log de ${model}`, err));
     }
 
     return client.$extends({

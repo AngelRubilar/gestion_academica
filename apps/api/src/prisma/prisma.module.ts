@@ -1,11 +1,4 @@
-import {
-  Global,
-  Inject,
-  Injectable,
-  Module,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Global, Inject, Injectable, Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuditContextModule } from '../modules/audit/audit-context.module';
 import { AuditContextService } from '../modules/audit/audit-context.service';

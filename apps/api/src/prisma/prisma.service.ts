@@ -18,10 +18,7 @@ export function createPrismaClient(
     adapter: new PrismaPg({
       connectionString: config.get('DATABASE_URL', { infer: true }),
     }),
-    log:
-      config.get('NODE_ENV', { infer: true }) === 'development'
-        ? ['warn', 'error']
-        : ['error'],
+    log: config.get('NODE_ENV', { infer: true }) === 'development' ? ['warn', 'error'] : ['error'],
   });
   return base.$extends(auditExtension(auditContext));
 }

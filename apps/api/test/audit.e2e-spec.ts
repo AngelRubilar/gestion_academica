@@ -35,10 +35,18 @@ describe('Audit (e2e)', () => {
     prisma = app.get(PrismaService);
     await cleanup();
     await prisma.user.create({
-      data: { email: SUPERADMIN_EMAIL, password: await bcrypt.hash(SUPERADMIN_PASSWORD, 10), role: 'SUPER_ADMIN' },
+      data: {
+        email: SUPERADMIN_EMAIL,
+        password: await bcrypt.hash(SUPERADMIN_PASSWORD, 10),
+        role: 'SUPER_ADMIN',
+      },
     });
     await prisma.user.create({
-      data: { email: PROFESOR_EMAIL, password: await bcrypt.hash(PROFESOR_PASSWORD, 10), role: 'PROFESOR' },
+      data: {
+        email: PROFESOR_EMAIL,
+        password: await bcrypt.hash(PROFESOR_PASSWORD, 10),
+        role: 'PROFESOR',
+      },
     });
   });
 
