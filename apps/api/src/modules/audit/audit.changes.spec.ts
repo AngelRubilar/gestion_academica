@@ -31,6 +31,12 @@ describe('deriveAction', () => {
   it('upsert sin pre-image (insertó) → CREATE', () => {
     expect(deriveAction('upsert', undefined, { id: '1' })).toBe(AUDIT_ACTIONS.CREATE);
   });
+
+  it('upsert con pre-image (actualizó) → UPDATE', () => {
+    expect(deriveAction('upsert', { id: '1', email: 'a' }, { id: '1', email: 'b' })).toBe(
+      AUDIT_ACTIONS.UPDATE,
+    );
+  });
 });
 
 describe('computeChanges', () => {

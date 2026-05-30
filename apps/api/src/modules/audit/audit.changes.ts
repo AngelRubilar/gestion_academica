@@ -11,6 +11,8 @@ function valuesEqual(a: unknown, b: unknown): boolean {
   }
   if (a === b) return true;
   // Comparación estructural de respaldo para objetos/arrays anidados.
+  // Limitación conocida: JSON.stringify es sensible al orden de claves y descarta
+  // valores undefined; en la práctica las filas de Prisma no traen undefined (null ≠ ausente).
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
