@@ -16,16 +16,27 @@ function valuesEqual(a: unknown, b: unknown): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
+function redactValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((item) => redactValue(item));
+  }
+  if (value !== null && typeof value === 'object' && (value as object).constructor === Object) {
+    return redactSnapshot(value as Row);
+  }
+  return value;
+}
+
 function redactSnapshot(row: Row): Row {
   const out: Row = {};
   for (const [key, value] of Object.entries(row)) {
-    out[key] = REDACTED_FIELDS.has(key) ? REDACTED_VALUE : value;
+    out[key] = REDACTED_FIELDS.has(key) ? REDACTED_VALUE : redactValue(value);
   }
   return out;
 }
 
 function redactField(key: string, value: unknown): unknown {
-  return REDACTED_FIELDS.has(key) ? REDACTED_VALUE : value;
+  if (REDACTED_FIELDS.has(key)) return REDACTED_VALUE;
+  return redactValue(value);
 }
 
 export function deriveAction(
@@ -51,7 +62,7 @@ export function computeChanges(
     return { new: redactSnapshot(post ?? {}) };
   }
   if (action === AUDIT_ACTIONS.DELETE) {
-    return { old: redactSnapshot(pre ?? {}) };
+    return { old: redactSnapshot(pre ?? post ?? {}) };
   }
   // UPDATE | DEACTIVATE | REACTIVATE → diff campo a campo
   const diff: Record<string, { old: unknown; new: unknown }> = {};

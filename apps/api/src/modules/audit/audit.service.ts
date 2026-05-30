@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { AuditAction } from '@gestion-academica/shared';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { AuditContext } from './audit-context.service';
 
@@ -33,7 +34,7 @@ export class AuditService {
         entityType: input.entityType,
         entityId: input.entityId,
         action: input.action,
-        changes: input.changes as never,
+        changes: input.changes as Prisma.InputJsonValue,
         userId: input.context.userId,
         userRole: input.context.userRole,
         ipAddress: input.context.ipAddress,

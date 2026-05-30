@@ -86,4 +86,35 @@ describe('computeChanges', () => {
     );
     expect(changes).toEqual({});
   });
+
+  it('redacta campos sensibles anidados en objetos', () => {
+    const changes = computeChanges(AUDIT_ACTIONS.CREATE, undefined, {
+      id: '1',
+      perfil: { password: 'x', nombre: 'Ana' },
+    });
+    expect(changes).toEqual({
+      new: { id: '1', perfil: { password: '[REDACTED]', nombre: 'Ana' } },
+    });
+  });
+
+  it('redacta campos sensibles dentro de arrays de objetos', () => {
+    const changes = computeChanges(AUDIT_ACTIONS.CREATE, undefined, {
+      id: '1',
+      tokens: [{ tokenHash: 'h1' }, { tokenHash: 'h2' }],
+    });
+    expect(changes).toEqual({
+      new: { id: '1', tokens: [{ tokenHash: '[REDACTED]' }, { tokenHash: '[REDACTED]' }] },
+    });
+  });
+
+  it('preserva valores Date en el snapshot (no los convierte en {})', () => {
+    const fecha = new Date('2026-01-01');
+    const changes = computeChanges(AUDIT_ACTIONS.CREATE, undefined, { id: '1', createdAt: fecha });
+    expect(changes).toEqual({ new: { id: '1', createdAt: fecha } });
+  });
+
+  it('DELETE usa el post-image como respaldo si no hubo pre-image', () => {
+    const changes = computeChanges(AUDIT_ACTIONS.DELETE, undefined, { id: '1', email: 'a@b.cl' });
+    expect(changes).toEqual({ old: { id: '1', email: 'a@b.cl' } });
+  });
 });
