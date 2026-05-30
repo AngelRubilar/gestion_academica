@@ -8,6 +8,7 @@ import type { Env } from './config/env.schema';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { AuditModule } from './modules/audit/audit.module';
 import { AuditContextMiddleware } from './modules/audit/audit-context.middleware';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -38,6 +39,7 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
     PrismaModule,
     HealthModule,
     AuthModule,
+    AuditModule,
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
