@@ -50,9 +50,13 @@ describe('App (e2e)', () => {
     expect(res.headers['access-control-allow-credentials']).toBe('true');
   });
 
-  it('GET /api/v1/__ok → 200 con cuerpo {data:"ok"}', async () => {
+  it('GET /api/v1/__ok → 200 con cuerpo {data:"ok"} (ruta @Public)', async () => {
     const res = await request(app.getHttpServer()).get('/api/v1/__ok').expect(200);
     expect(res.body).toEqual({ data: 'ok' });
+  });
+
+  it('GET /api/v1/__protected sin token → 401 (auth global por defecto)', async () => {
+    await request(app.getHttpServer()).get('/api/v1/__protected').expect(401);
   });
 
   it('GET /api/v1/__nope → 404 con formato de error uniforme', async () => {
