@@ -132,6 +132,19 @@ Constante central (`AUDITED_MODELS`). Inicialmente contiene **`User`** — el ú
 - Particionamiento de la tabla por fecha — futuro, cuando el volumen lo justifique.
 - Usuario `SYSTEM` de fallback — las escrituras sin contexto simplemente se omiten.
 
+## Refinamientos durante la implementación
+
+Decisiones tomadas al implementar que ajustan o aclaran el diseño original:
+
+- **Middleware en vez de interceptor** (refina §Componentes/2): el contexto de ALS se establece en un middleware Express (`AuditContextMiddleware`), no en un interceptor. Un interceptor devuelve un Observable cuyo handler corre al suscribirse, fuera del `als.run`; el middleware envuelve toda la continuación async (guards, handler, queries), así el contexto llega íntegro a la extensión. Se guarda la request y el `.user` se lee al escribir el log (ya poblado por `JwtAuthGuard`).
+- **La extensión bypassa `AuditService.log()`**: la extensión escribe directo con `client.auditLog.create` porque no puede inyectar `AuditService` sin crear un ciclo `PrismaService → AuditService → PrismaService`. `AuditService.log()` queda como API manual pública (criterio de la issue) para usos futuros desde servicios de dominio.
+- **Redacción recursiva**: la redacción de campos sensibles (`password`, `tokenHash`) recorre objetos y arrays anidados (no solo el nivel superior), como red de seguridad para cuando los CRUD futuros escriban con `include` de relaciones. Las `Date` y primitivos se preservan.
+
+## Limitaciones conocidas (seguimiento futuro)
+
+- **Escrituras dentro de transacciones**: la extensión audita sobre el cliente top-level, no sobre el cliente de una `$transaction`. Si una transacción que contiene una escritura auditada hace rollback, queda un audit log "fantasma" del cambio que nunca se confirmó. Hoy ningún modelo auditado se escribe dentro de una transacción; revisar cuando los CRUD agreguen escrituras transaccionales.
+- **`valuesEqual` y `undefined`**: la comparación de respaldo usa `JSON.stringify`, sensible al orden de claves y que descarta `undefined`. En la práctica las filas de Prisma no traen `undefined` (null ≠ ausente).
+
 ## Criterios de aceptación (issue #72)
 
 - [ ] Cualquier cambio en una entidad del allowlist se registra automáticamente → extensión Prisma.
