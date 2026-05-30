@@ -33,6 +33,12 @@ describe('Auth (e2e)', () => {
     await app.init();
 
     prisma = app.get(PrismaService);
+    await prisma.auditLog.deleteMany({
+      where: { user: { email: { endsWith: TEST_EMAIL_DOMAIN } } },
+    });
+    await prisma.refreshToken.deleteMany({
+      where: { user: { email: { endsWith: TEST_EMAIL_DOMAIN } } },
+    });
     await prisma.user.deleteMany({ where: { email: { endsWith: TEST_EMAIL_DOMAIN } } });
     await prisma.user.create({
       data: {
@@ -59,6 +65,9 @@ describe('Auth (e2e)', () => {
 
   afterAll(async () => {
     await prisma.refreshToken.deleteMany({
+      where: { user: { email: { endsWith: TEST_EMAIL_DOMAIN } } },
+    });
+    await prisma.auditLog.deleteMany({
       where: { user: { email: { endsWith: TEST_EMAIL_DOMAIN } } },
     });
     await prisma.user.deleteMany({ where: { email: { endsWith: TEST_EMAIL_DOMAIN } } });
