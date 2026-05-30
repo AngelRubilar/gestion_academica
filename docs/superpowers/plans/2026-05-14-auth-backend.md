@@ -27,29 +27,30 @@
 
 ## Estructura de archivos
 
-| Archivo | Responsabilidad | Tarea |
-|---|---|---|
-| `apps/api/package.json` | Dependencias de auth | 1 |
-| `apps/api/prisma/schema.prisma` | `RefreshToken` con `tokenHash` + `revokedAt` | 2 |
-| `apps/api/src/common/guards/jwt-auth.guard.ts` | Wrapper de `AuthGuard('jwt')` | 3 |
-| `apps/api/src/common/index.ts` | Barrel export del nuevo guard | 3 |
-| `apps/api/src/modules/auth/dto/register.dto.ts` | Validación del body de register | 4 |
-| `apps/api/src/modules/auth/dto/login.dto.ts` | Validación del body de login | 4 |
-| `apps/api/src/modules/auth/dto/refresh.dto.ts` | Validación del body de refresh | 4 |
-| `apps/api/src/modules/auth/dto/logout.dto.ts` | Validación del body de logout | 4 |
-| `apps/api/src/modules/auth/refresh-token.service.ts` | Ciclo de vida del refresh token | 5 |
-| `apps/api/src/modules/auth/strategies/jwt.strategy.ts` | Valida el access token, devuelve `RequestUser` | 6 |
-| `apps/api/src/modules/auth/auth.service.ts` | Orquestación: register, login, refresh, logout | 7-9 |
-| `apps/api/src/modules/auth/auth.controller.ts` | Los 4 endpoints HTTP | 10 |
-| `apps/api/src/modules/auth/auth.module.ts` | Wiring del módulo | 11 |
-| `apps/api/src/app.module.ts` | Importa `AuthModule` | 11 |
-| `apps/api/test/auth.e2e-spec.ts` | Flujo end-to-end | 12 |
+| Archivo                                                | Responsabilidad                                | Tarea |
+| ------------------------------------------------------ | ---------------------------------------------- | ----- |
+| `apps/api/package.json`                                | Dependencias de auth                           | 1     |
+| `apps/api/prisma/schema.prisma`                        | `RefreshToken` con `tokenHash` + `revokedAt`   | 2     |
+| `apps/api/src/common/guards/jwt-auth.guard.ts`         | Wrapper de `AuthGuard('jwt')`                  | 3     |
+| `apps/api/src/common/index.ts`                         | Barrel export del nuevo guard                  | 3     |
+| `apps/api/src/modules/auth/dto/register.dto.ts`        | Validación del body de register                | 4     |
+| `apps/api/src/modules/auth/dto/login.dto.ts`           | Validación del body de login                   | 4     |
+| `apps/api/src/modules/auth/dto/refresh.dto.ts`         | Validación del body de refresh                 | 4     |
+| `apps/api/src/modules/auth/dto/logout.dto.ts`          | Validación del body de logout                  | 4     |
+| `apps/api/src/modules/auth/refresh-token.service.ts`   | Ciclo de vida del refresh token                | 5     |
+| `apps/api/src/modules/auth/strategies/jwt.strategy.ts` | Valida el access token, devuelve `RequestUser` | 6     |
+| `apps/api/src/modules/auth/auth.service.ts`            | Orquestación: register, login, refresh, logout | 7-9   |
+| `apps/api/src/modules/auth/auth.controller.ts`         | Los 4 endpoints HTTP                           | 10    |
+| `apps/api/src/modules/auth/auth.module.ts`             | Wiring del módulo                              | 11    |
+| `apps/api/src/app.module.ts`                           | Importa `AuthModule`                           | 11    |
+| `apps/api/test/auth.e2e-spec.ts`                       | Flujo end-to-end                               | 12    |
 
 ---
 
 ## Task 1: Instalar dependencias
 
 **Files:**
+
 - Modify: `apps/api/package.json`
 - Modify: `pnpm-lock.yaml`
 
@@ -58,6 +59,7 @@
 `bcrypt` hoy está en `devDependencies` pero el `AuthService` lo usa en runtime. Correr `pnpm add` sin `-D` lo mueve a `dependencies`.
 
 Run:
+
 ```bash
 pnpm --filter @gestion-academica/api add @nestjs/jwt @nestjs/passport passport passport-jwt bcrypt
 pnpm --filter @gestion-academica/api add -D @types/passport-jwt
@@ -66,6 +68,7 @@ pnpm --filter @gestion-academica/api add -D @types/passport-jwt
 - [ ] **Step 2: Verificar el resultado en `package.json`**
 
 Abrir `apps/api/package.json` y confirmar:
+
 - `dependencies` ahora incluye `@nestjs/jwt`, `@nestjs/passport`, `passport`, `passport-jwt`, `bcrypt`.
 - `bcrypt` **ya no** está en `devDependencies`.
 - `devDependencies` incluye `@types/passport-jwt` y conserva `@types/bcrypt`.
@@ -87,6 +90,7 @@ git commit -m "chore(api): instala dependencias de auth (jwt, passport, bcrypt)"
 ## Task 2: Migrar el schema de `RefreshToken`
 
 **Files:**
+
 - Modify: `apps/api/prisma/schema.prisma` (modelo `RefreshToken`, líneas 114-125)
 - Create: `apps/api/prisma/migrations/<timestamp>_auth_refresh_token_rotation/migration.sql` (generado por Prisma)
 
@@ -136,6 +140,7 @@ git commit -m "feat(api): RefreshToken con tokenHash y revokedAt para rotación"
 ## Task 3: `JwtAuthGuard`
 
 **Files:**
+
 - Create: `apps/api/src/common/guards/jwt-auth.guard.ts`
 - Modify: `apps/api/src/common/index.ts`
 
@@ -194,6 +199,7 @@ git commit -m "feat(api): JwtAuthGuard en common/guards"
 ## Task 4: DTOs de auth
 
 **Files:**
+
 - Create: `apps/api/src/modules/auth/dto/register.dto.ts`
 - Create: `apps/api/src/modules/auth/dto/login.dto.ts`
 - Create: `apps/api/src/modules/auth/dto/refresh.dto.ts`
@@ -293,6 +299,7 @@ git commit -m "feat(api): DTOs de auth (register, login, refresh, logout)"
 ## Task 5: `RefreshTokenService`
 
 **Files:**
+
 - Create: `apps/api/src/modules/auth/refresh-token.service.ts`
 - Test: `apps/api/src/modules/auth/refresh-token.service.spec.ts`
 
@@ -535,6 +542,7 @@ git commit -m "feat(api): RefreshTokenService con rotación y detección de reus
 ## Task 6: `JwtStrategy`
 
 **Files:**
+
 - Create: `apps/api/src/modules/auth/strategies/jwt.strategy.ts`
 - Test: `apps/api/src/modules/auth/strategies/jwt.strategy.spec.ts`
 
@@ -576,9 +584,9 @@ describe('JwtStrategy', () => {
   it('lanza UnauthorizedException si el usuario no existe', async () => {
     prisma.user.findUnique.mockResolvedValue(null);
 
-    await expect(
-      strategy.validate({ sub: 'u1', email: 'a@b.cl', role: 'ADMIN' }),
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(strategy.validate({ sub: 'u1', email: 'a@b.cl', role: 'ADMIN' })).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('lanza UnauthorizedException si el usuario está inactivo', async () => {
@@ -589,9 +597,9 @@ describe('JwtStrategy', () => {
       isActive: false,
     });
 
-    await expect(
-      strategy.validate({ sub: 'u1', email: 'a@b.cl', role: 'ADMIN' }),
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(strategy.validate({ sub: 'u1', email: 'a@b.cl', role: 'ADMIN' })).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 });
 ```
@@ -661,6 +669,7 @@ git commit -m "feat(api): JwtStrategy para validar access tokens"
 ## Task 7: `AuthService.register`
 
 **Files:**
+
 - Create: `apps/api/src/modules/auth/auth.service.ts`
 - Test: `apps/api/src/modules/auth/auth.service.spec.ts`
 
@@ -739,9 +748,9 @@ describe('AuthService', () => {
     });
 
     it('lanza ForbiddenException si un ADMIN intenta crear un SUPER_ADMIN', async () => {
-      await expect(
-        service.register({ ...dto, role: 'SUPER_ADMIN' }, ADMIN),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.register({ ...dto, role: 'SUPER_ADMIN' }, ADMIN)).rejects.toThrow(
+        ForbiddenException,
+      );
       expect(prisma.user.findUnique).not.toHaveBeenCalled();
     });
 
@@ -850,6 +859,7 @@ git commit -m "feat(api): AuthService.register con sub-regla de roles"
 ## Task 8: `AuthService.login` y `AuthService.logout`
 
 **Files:**
+
 - Modify: `apps/api/src/modules/auth/auth.service.ts`
 - Test: `apps/api/src/modules/auth/auth.service.spec.ts`
 
@@ -860,72 +870,72 @@ Agrega `login`, `logout` y el helper privado `issueTokens`. `login` compara bcry
 `bcrypt` ya está importado en `auth.service.spec.ts` desde la Task 7. Agregar estos dos bloques `describe` dentro del `describe('AuthService', ...)`, después del `describe('register', ...)`:
 
 ```typescript
-  describe('login', () => {
-    const PASSWORD = 'correcta1';
-    const passwordHash = bcrypt.hashSync(PASSWORD, 10);
+describe('login', () => {
+  const PASSWORD = 'correcta1';
+  const passwordHash = bcrypt.hashSync(PASSWORD, 10);
 
-    function mockUser(overrides: Record<string, unknown> = {}) {
-      return {
-        id: 'u1',
-        email: 'user@b.cl',
-        password: passwordHash,
-        role: 'PROFESOR',
-        isActive: true,
-        ...overrides,
-      };
-    }
+  function mockUser(overrides: Record<string, unknown> = {}) {
+    return {
+      id: 'u1',
+      email: 'user@b.cl',
+      password: passwordHash,
+      role: 'PROFESOR',
+      isActive: true,
+      ...overrides,
+    };
+  }
 
-    it('devuelve access token, refresh token y los datos del usuario', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser());
-      jwt.sign.mockReturnValue('signed-access-token');
-      refreshTokens.issue.mockResolvedValue('raw-refresh-token');
+  it('devuelve access token, refresh token y los datos del usuario', async () => {
+    prisma.user.findUnique.mockResolvedValue(mockUser());
+    jwt.sign.mockReturnValue('signed-access-token');
+    refreshTokens.issue.mockResolvedValue('raw-refresh-token');
 
-      const result = await service.login({ email: 'user@b.cl', password: PASSWORD });
+    const result = await service.login({ email: 'user@b.cl', password: PASSWORD });
 
-      expect(result).toEqual({
-        accessToken: 'signed-access-token',
-        refreshToken: 'raw-refresh-token',
-        user: { id: 'u1', email: 'user@b.cl', role: 'PROFESOR' },
-      });
-      expect(jwt.sign).toHaveBeenCalledWith({ sub: 'u1', email: 'user@b.cl', role: 'PROFESOR' });
-      expect(refreshTokens.issue).toHaveBeenCalledWith('u1');
+    expect(result).toEqual({
+      accessToken: 'signed-access-token',
+      refreshToken: 'raw-refresh-token',
+      user: { id: 'u1', email: 'user@b.cl', role: 'PROFESOR' },
     });
-
-    it('lanza UnauthorizedException si el password es incorrecto', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser());
-
-      await expect(
-        service.login({ email: 'user@b.cl', password: 'incorrecta' }),
-      ).rejects.toThrow('Credenciales inválidas');
-      expect(refreshTokens.issue).not.toHaveBeenCalled();
-    });
-
-    it('lanza UnauthorizedException si el email no existe', async () => {
-      prisma.user.findUnique.mockResolvedValue(null);
-
-      await expect(
-        service.login({ email: 'noexiste@b.cl', password: PASSWORD }),
-      ).rejects.toThrow('Credenciales inválidas');
-    });
-
-    it('lanza UnauthorizedException si el usuario está inactivo', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser({ isActive: false }));
-
-      await expect(
-        service.login({ email: 'user@b.cl', password: PASSWORD }),
-      ).rejects.toThrow('Credenciales inválidas');
-    });
+    expect(jwt.sign).toHaveBeenCalledWith({ sub: 'u1', email: 'user@b.cl', role: 'PROFESOR' });
+    expect(refreshTokens.issue).toHaveBeenCalledWith('u1');
   });
 
-  describe('logout', () => {
-    it('revoca el refresh token recibido', async () => {
-      refreshTokens.revoke.mockResolvedValue(undefined);
+  it('lanza UnauthorizedException si el password es incorrecto', async () => {
+    prisma.user.findUnique.mockResolvedValue(mockUser());
 
-      await service.logout({ refreshToken: 'raw-refresh-token' });
-
-      expect(refreshTokens.revoke).toHaveBeenCalledWith('raw-refresh-token');
-    });
+    await expect(service.login({ email: 'user@b.cl', password: 'incorrecta' })).rejects.toThrow(
+      'Credenciales inválidas',
+    );
+    expect(refreshTokens.issue).not.toHaveBeenCalled();
   });
+
+  it('lanza UnauthorizedException si el email no existe', async () => {
+    prisma.user.findUnique.mockResolvedValue(null);
+
+    await expect(service.login({ email: 'noexiste@b.cl', password: PASSWORD })).rejects.toThrow(
+      'Credenciales inválidas',
+    );
+  });
+
+  it('lanza UnauthorizedException si el usuario está inactivo', async () => {
+    prisma.user.findUnique.mockResolvedValue(mockUser({ isActive: false }));
+
+    await expect(service.login({ email: 'user@b.cl', password: PASSWORD })).rejects.toThrow(
+      'Credenciales inválidas',
+    );
+  });
+});
+
+describe('logout', () => {
+  it('revoca el refresh token recibido', async () => {
+    refreshTokens.revoke.mockResolvedValue(undefined);
+
+    await service.logout({ refreshToken: 'raw-refresh-token' });
+
+    expect(refreshTokens.revoke).toHaveBeenCalledWith('raw-refresh-token');
+  });
+});
 ```
 
 - [ ] **Step 2: Correr los tests para verificar que fallan**
@@ -1008,6 +1018,7 @@ git commit -m "feat(api): AuthService login y logout"
 ## Task 9: `AuthService.refresh`
 
 **Files:**
+
 - Modify: `apps/api/src/modules/auth/auth.service.ts`
 - Test: `apps/api/src/modules/auth/auth.service.spec.ts`
 
@@ -1018,61 +1029,61 @@ git commit -m "feat(api): AuthService login y logout"
 En `apps/api/src/modules/auth/auth.service.spec.ts`, agregar este `describe` dentro del `describe('AuthService', ...)`, después del `describe('logout', ...)`:
 
 ```typescript
-  describe('refresh', () => {
-    it('rota los tokens: consume el viejo y emite uno nuevo', async () => {
-      refreshTokens.consume.mockResolvedValue('u1');
-      prisma.user.findUnique.mockResolvedValue({
-        id: 'u1',
-        email: 'user@b.cl',
-        role: 'PROFESOR',
-        isActive: true,
-      });
-      jwt.sign.mockReturnValue('nuevo-access-token');
-      refreshTokens.issue.mockResolvedValue('nuevo-refresh-token');
-
-      const result = await service.refresh({ refreshToken: 'viejo-refresh-token' });
-
-      expect(refreshTokens.consume).toHaveBeenCalledWith('viejo-refresh-token');
-      expect(result).toEqual({
-        accessToken: 'nuevo-access-token',
-        refreshToken: 'nuevo-refresh-token',
-      });
+describe('refresh', () => {
+  it('rota los tokens: consume el viejo y emite uno nuevo', async () => {
+    refreshTokens.consume.mockResolvedValue('u1');
+    prisma.user.findUnique.mockResolvedValue({
+      id: 'u1',
+      email: 'user@b.cl',
+      role: 'PROFESOR',
+      isActive: true,
     });
+    jwt.sign.mockReturnValue('nuevo-access-token');
+    refreshTokens.issue.mockResolvedValue('nuevo-refresh-token');
 
-    it('propaga el error si consume rechaza el token (inválido / reuso)', async () => {
-      refreshTokens.consume.mockRejectedValue(new Error('Refresh token inválido'));
+    const result = await service.refresh({ refreshToken: 'viejo-refresh-token' });
 
-      await expect(
-        service.refresh({ refreshToken: 'token-malo' }),
-      ).rejects.toThrow('Refresh token inválido');
-      expect(refreshTokens.issue).not.toHaveBeenCalled();
-    });
-
-    it('lanza UnauthorizedException si el usuario ya no existe', async () => {
-      refreshTokens.consume.mockResolvedValue('u1');
-      prisma.user.findUnique.mockResolvedValue(null);
-
-      await expect(
-        service.refresh({ refreshToken: 'viejo-refresh-token' }),
-      ).rejects.toThrow('Refresh token inválido');
-      expect(refreshTokens.issue).not.toHaveBeenCalled();
-    });
-
-    it('lanza UnauthorizedException si el usuario está inactivo', async () => {
-      refreshTokens.consume.mockResolvedValue('u1');
-      prisma.user.findUnique.mockResolvedValue({
-        id: 'u1',
-        email: 'user@b.cl',
-        role: 'PROFESOR',
-        isActive: false,
-      });
-
-      await expect(
-        service.refresh({ refreshToken: 'viejo-refresh-token' }),
-      ).rejects.toThrow('Refresh token inválido');
-      expect(refreshTokens.issue).not.toHaveBeenCalled();
+    expect(refreshTokens.consume).toHaveBeenCalledWith('viejo-refresh-token');
+    expect(result).toEqual({
+      accessToken: 'nuevo-access-token',
+      refreshToken: 'nuevo-refresh-token',
     });
   });
+
+  it('propaga el error si consume rechaza el token (inválido / reuso)', async () => {
+    refreshTokens.consume.mockRejectedValue(new Error('Refresh token inválido'));
+
+    await expect(service.refresh({ refreshToken: 'token-malo' })).rejects.toThrow(
+      'Refresh token inválido',
+    );
+    expect(refreshTokens.issue).not.toHaveBeenCalled();
+  });
+
+  it('lanza UnauthorizedException si el usuario ya no existe', async () => {
+    refreshTokens.consume.mockResolvedValue('u1');
+    prisma.user.findUnique.mockResolvedValue(null);
+
+    await expect(service.refresh({ refreshToken: 'viejo-refresh-token' })).rejects.toThrow(
+      'Refresh token inválido',
+    );
+    expect(refreshTokens.issue).not.toHaveBeenCalled();
+  });
+
+  it('lanza UnauthorizedException si el usuario está inactivo', async () => {
+    refreshTokens.consume.mockResolvedValue('u1');
+    prisma.user.findUnique.mockResolvedValue({
+      id: 'u1',
+      email: 'user@b.cl',
+      role: 'PROFESOR',
+      isActive: false,
+    });
+
+    await expect(service.refresh({ refreshToken: 'viejo-refresh-token' })).rejects.toThrow(
+      'Refresh token inválido',
+    );
+    expect(refreshTokens.issue).not.toHaveBeenCalled();
+  });
+});
 ```
 
 - [ ] **Step 2: Correr los tests para verificar que fallan**
@@ -1120,6 +1131,7 @@ git commit -m "feat(api): AuthService.refresh con rotación de tokens"
 ## Task 10: `AuthController`
 
 **Files:**
+
 - Create: `apps/api/src/modules/auth/auth.controller.ts`
 - Test: `apps/api/src/modules/auth/auth.controller.spec.ts`
 
@@ -1262,6 +1274,7 @@ git commit -m "feat(api): AuthController con los 4 endpoints de auth"
 ## Task 11: `AuthModule` e integración en `AppModule`
 
 **Files:**
+
 - Create: `apps/api/src/modules/auth/auth.module.ts`
 - Modify: `apps/api/src/app.module.ts`
 
@@ -1337,6 +1350,7 @@ git commit -m "feat(api): AuthModule integrado en AppModule"
 ## Task 12: Tests e2e del flujo de autenticación
 
 **Files:**
+
 - Create: `apps/api/test/auth.e2e-spec.ts`
 
 Postgres real (mismo setup que `app.e2e-spec.ts`). El test crea su propio `SUPER_ADMIN` con un email marcado (`@e2e-auth.local`) en `beforeAll` y limpia todo lo creado en `afterAll`. No depende del seed.
@@ -1465,10 +1479,7 @@ describe('Auth (e2e)', () => {
     expect(created.body.data).not.toHaveProperty('password');
 
     // refresh rota los tokens
-    const refreshed = await server
-      .post('/api/v1/auth/refresh')
-      .send({ refreshToken })
-      .expect(200);
+    const refreshed = await server.post('/api/v1/auth/refresh').send({ refreshToken }).expect(200);
     const newRefreshToken = refreshed.body.data.refreshToken;
     expect(newRefreshToken).not.toBe(refreshToken);
 
@@ -1476,16 +1487,10 @@ describe('Auth (e2e)', () => {
     await server.post('/api/v1/auth/refresh').send({ refreshToken }).expect(401);
 
     // el reuso revocó toda la familia: el token nuevo tampoco sirve
-    await server
-      .post('/api/v1/auth/refresh')
-      .send({ refreshToken: newRefreshToken })
-      .expect(401);
+    await server.post('/api/v1/auth/refresh').send({ refreshToken: newRefreshToken }).expect(401);
 
     // logout responde 204 y es idempotente
-    await server
-      .post('/api/v1/auth/logout')
-      .send({ refreshToken: newRefreshToken })
-      .expect(204);
+    await server.post('/api/v1/auth/logout').send({ refreshToken: newRefreshToken }).expect(204);
   });
 });
 ```

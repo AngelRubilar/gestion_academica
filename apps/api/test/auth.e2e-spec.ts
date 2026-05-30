@@ -119,7 +119,11 @@ describe('Auth (e2e)', () => {
     await server
       .post('/api/v1/auth/register')
       .set('Authorization', `Bearer ${login.body.data.accessToken}`)
-      .send({ email: `superadmin-nuevo${TEST_EMAIL_DOMAIN}`, password: 'secret1', role: 'SUPER_ADMIN' })
+      .send({
+        email: `superadmin-nuevo${TEST_EMAIL_DOMAIN}`,
+        password: 'secret1',
+        role: 'SUPER_ADMIN',
+      })
       .expect(403);
   });
 
@@ -141,10 +145,7 @@ describe('Auth (e2e)', () => {
     expect(created.body.data).not.toHaveProperty('password');
 
     // refresh rota los tokens
-    const refreshed = await server
-      .post('/api/v1/auth/refresh')
-      .send({ refreshToken })
-      .expect(200);
+    const refreshed = await server.post('/api/v1/auth/refresh').send({ refreshToken }).expect(200);
     const newRefreshToken = refreshed.body.data.refreshToken;
     expect(newRefreshToken).not.toBe(refreshToken);
 
@@ -152,15 +153,9 @@ describe('Auth (e2e)', () => {
     await server.post('/api/v1/auth/refresh').send({ refreshToken }).expect(401);
 
     // el reuso revocó toda la familia: el token nuevo tampoco sirve
-    await server
-      .post('/api/v1/auth/refresh')
-      .send({ refreshToken: newRefreshToken })
-      .expect(401);
+    await server.post('/api/v1/auth/refresh').send({ refreshToken: newRefreshToken }).expect(401);
 
     // logout responde 204 y es idempotente
-    await server
-      .post('/api/v1/auth/logout')
-      .send({ refreshToken: newRefreshToken })
-      .expect(204);
+    await server.post('/api/v1/auth/logout').send({ refreshToken: newRefreshToken }).expect(204);
   });
 });

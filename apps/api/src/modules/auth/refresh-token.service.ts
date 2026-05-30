@@ -64,7 +64,9 @@ export class RefreshTokenService {
     });
     if (updated.count === 0) {
       // Perdimos la carrera — otro caller ya consumió este token. Eso es reuso.
-      this.logger.warn(`Detección de reuso de refresh token (carrera) para usuario ${stored.userId}`);
+      this.logger.warn(
+        `Detección de reuso de refresh token (carrera) para usuario ${stored.userId}`,
+      );
       await this.revokeAllForUser(stored.userId);
       throw new UnauthorizedException(INVALID_TOKEN_MESSAGE);
     }

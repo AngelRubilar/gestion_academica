@@ -8,7 +8,7 @@
 ## Objetivo
 
 Implementar autenticación con JWT (access token) + refresh tokens con rotación en
-NestJS. Este issue es el *keystone* del backend: hace funcionar los stubs ya
+NestJS. Este issue es el _keystone_ del backend: hace funcionar los stubs ya
 existentes `RolesGuard`, `@CurrentUser()` y el tipo `RequestUser`, que hoy denegan
 todo endpoint protegido porque nadie puebla `request.user`.
 
@@ -94,13 +94,13 @@ apps/api/test/
 
 ### Responsabilidades
 
-| Unidad | Responsabilidad | Depende de |
-|---|---|---|
-| `AuthController` | Solo HTTP: rutas, DTOs, status codes. Sin lógica. | `AuthService` |
-| `AuthService` | Orquesta. Valida credenciales, hashea passwords (bcrypt, cost 10), emite access tokens vía `JwtService`, delega refresh tokens. | `PrismaService`, `JwtService`, `RefreshTokenService` |
-| `RefreshTokenService` | Dueño exclusivo del ciclo de vida del refresh token: emitir, rotar, validar-y-consumir, revocar, detección de reuso. | `PrismaService`, `ConfigService` |
-| `JwtStrategy` | Provider de passport. Valida el access token, recarga el `User`, verifica `isActive`, devuelve `RequestUser`. | `PrismaService`, `ConfigService` |
-| `JwtAuthGuard` | Wrapper de `AuthGuard('jwt')`. Vive en `common/guards/`. | — |
+| Unidad                | Responsabilidad                                                                                                                 | Depende de                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `AuthController`      | Solo HTTP: rutas, DTOs, status codes. Sin lógica.                                                                               | `AuthService`                                        |
+| `AuthService`         | Orquesta. Valida credenciales, hashea passwords (bcrypt, cost 10), emite access tokens vía `JwtService`, delega refresh tokens. | `PrismaService`, `JwtService`, `RefreshTokenService` |
+| `RefreshTokenService` | Dueño exclusivo del ciclo de vida del refresh token: emitir, rotar, validar-y-consumir, revocar, detección de reuso.            | `PrismaService`, `ConfigService`                     |
+| `JwtStrategy`         | Provider de passport. Valida el access token, recarga el `User`, verifica `isActive`, devuelve `RequestUser`.                   | `PrismaService`, `ConfigService`                     |
+| `JwtAuthGuard`        | Wrapper de `AuthGuard('jwt')`. Vive en `common/guards/`.                                                                        | —                                                    |
 
 **Por qué `JwtAuthGuard` en `common/` y `JwtStrategy` en `auth/`:** la strategy
 debe registrarse como provider de un módulo (`AuthModule`); el guard es solo
@@ -142,7 +142,7 @@ salen con el formato uniforme del `HttpExceptionFilter`.
 
 ### `POST /auth/refresh` — público
 
-El refresh token *es* la credencial.
+El refresh token _es_ la credencial.
 
 - Body `RefreshDto`: `refreshToken`.
 - Token no encontrado / expirado / usuario inactivo → `401` ("Refresh token
@@ -229,12 +229,12 @@ model RefreshToken {
 Todo vía el `HttpExceptionFilter` existente, con excepciones de NestJS y mensajes
 en español:
 
-| Excepción | Status | Caso |
-|---|---|---|
-| `ConflictException` | 409 | Email ya registrado en register |
-| `UnauthorizedException` | 401 | Credenciales inválidas; refresh token inválido/expirado/revocado; usuario inactivo |
-| `ForbiddenException` | 403 | `RolesGuard` cuando el rol no alcanza; ADMIN intentando crear SUPER_ADMIN |
-| `BadRequestException` | 400 | `ValidationPipe` global sobre DTOs malformados |
+| Excepción               | Status | Caso                                                                               |
+| ----------------------- | ------ | ---------------------------------------------------------------------------------- |
+| `ConflictException`     | 409    | Email ya registrado en register                                                    |
+| `UnauthorizedException` | 401    | Credenciales inválidas; refresh token inválido/expirado/revocado; usuario inactivo |
+| `ForbiddenException`    | 403    | `RolesGuard` cuando el rol no alcanza; ADMIN intentando crear SUPER_ADMIN          |
+| `BadRequestException`   | 400    | `ValidationPipe` global sobre DTOs malformados                                     |
 
 - Mensajes de auth genéricos (no filtran si un usuario existe).
 - En login, la comparación bcrypt corre siempre (hash dummy si el email no existe)

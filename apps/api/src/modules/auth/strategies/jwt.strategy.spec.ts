@@ -29,9 +29,9 @@ describe('JwtStrategy', () => {
   it('lanza UnauthorizedException si el usuario no existe', async () => {
     prisma.user.findUnique.mockResolvedValue(null);
 
-    await expect(
-      strategy.validate({ sub: 'u1', email: 'a@b.cl', role: 'ADMIN' }),
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(strategy.validate({ sub: 'u1', email: 'a@b.cl', role: 'ADMIN' })).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('lanza UnauthorizedException si el usuario está inactivo', async () => {
@@ -42,8 +42,8 @@ describe('JwtStrategy', () => {
       isActive: false,
     });
 
-    await expect(
-      strategy.validate({ sub: 'u1', email: 'a@b.cl', role: 'ADMIN' }),
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(strategy.validate({ sub: 'u1', email: 'a@b.cl', role: 'ADMIN' })).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 });

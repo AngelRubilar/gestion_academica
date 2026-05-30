@@ -66,9 +66,9 @@ describe('AuthService', () => {
     });
 
     it('lanza ForbiddenException si un ADMIN intenta crear un SUPER_ADMIN', async () => {
-      await expect(
-        service.register({ ...dto, role: 'SUPER_ADMIN' }, ADMIN),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.register({ ...dto, role: 'SUPER_ADMIN' }, ADMIN)).rejects.toThrow(
+        ForbiddenException,
+      );
       expect(prisma.user.findUnique).not.toHaveBeenCalled();
     });
 
@@ -123,26 +123,26 @@ describe('AuthService', () => {
     it('lanza UnauthorizedException si el password es incorrecto', async () => {
       prisma.user.findUnique.mockResolvedValue(mockUser());
 
-      await expect(
-        service.login({ email: 'user@b.cl', password: 'incorrecta' }),
-      ).rejects.toThrow('Credenciales inválidas');
+      await expect(service.login({ email: 'user@b.cl', password: 'incorrecta' })).rejects.toThrow(
+        'Credenciales inválidas',
+      );
       expect(refreshTokens.issue).not.toHaveBeenCalled();
     });
 
     it('lanza UnauthorizedException si el email no existe', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.login({ email: 'noexiste@b.cl', password: PASSWORD }),
-      ).rejects.toThrow('Credenciales inválidas');
+      await expect(service.login({ email: 'noexiste@b.cl', password: PASSWORD })).rejects.toThrow(
+        'Credenciales inválidas',
+      );
     });
 
     it('lanza UnauthorizedException si el usuario está inactivo', async () => {
       prisma.user.findUnique.mockResolvedValue(mockUser({ isActive: false }));
 
-      await expect(
-        service.login({ email: 'user@b.cl', password: PASSWORD }),
-      ).rejects.toThrow('Credenciales inválidas');
+      await expect(service.login({ email: 'user@b.cl', password: PASSWORD })).rejects.toThrow(
+        'Credenciales inválidas',
+      );
     });
   });
 
@@ -180,9 +180,9 @@ describe('AuthService', () => {
     it('propaga el error si consume rechaza el token (inválido / reuso)', async () => {
       refreshTokens.consume.mockRejectedValue(new Error('Refresh token inválido'));
 
-      await expect(
-        service.refresh({ refreshToken: 'token-malo' }),
-      ).rejects.toThrow('Refresh token inválido');
+      await expect(service.refresh({ refreshToken: 'token-malo' })).rejects.toThrow(
+        'Refresh token inválido',
+      );
       expect(refreshTokens.issue).not.toHaveBeenCalled();
     });
 
@@ -190,9 +190,9 @@ describe('AuthService', () => {
       refreshTokens.consume.mockResolvedValue('u1');
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.refresh({ refreshToken: 'viejo-refresh-token' }),
-      ).rejects.toThrow('Refresh token inválido');
+      await expect(service.refresh({ refreshToken: 'viejo-refresh-token' })).rejects.toThrow(
+        'Refresh token inválido',
+      );
       expect(refreshTokens.issue).not.toHaveBeenCalled();
     });
 
@@ -205,9 +205,9 @@ describe('AuthService', () => {
         isActive: false,
       });
 
-      await expect(
-        service.refresh({ refreshToken: 'viejo-refresh-token' }),
-      ).rejects.toThrow('Refresh token inválido');
+      await expect(service.refresh({ refreshToken: 'viejo-refresh-token' })).rejects.toThrow(
+        'Refresh token inválido',
+      );
       expect(refreshTokens.issue).not.toHaveBeenCalled();
     });
   });
